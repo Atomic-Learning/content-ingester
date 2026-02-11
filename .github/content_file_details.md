@@ -20,6 +20,14 @@ print("Hello, world!")
 </r-cell>
 ```
 
+### Guidance for Sample Solutions for Coding Problems
+
+* Aim to break the solution into a sequence of logical steps, each with a short explanatory paragraph (`<p>`) before a code cell.
+* Each code cell should focus on a single operation or concept, and the explanation should help the learner understand what to expect or why the step is important.
+* Avoid including output comments in code cells—users can run the code to see the output themselves.
+* Avoid summary sections at the end; instead, weave key insights into the explanations between code cells.
+* This approach helps learners follow the reasoning and see the solution unfold step by step, but you do not need to be overly prescriptive—use your judgment to keep the solution clear and concise.
+
 ## `metadata.json` file
 
 This file contains the metadata for the page, including the title, description, and pre-requisites. It should be written in json format. The following fields should be included:
