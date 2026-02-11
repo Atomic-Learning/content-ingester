@@ -7,6 +7,17 @@ This file contains the content as it will appear on the page. It should be writt
 * The page should not contain a `<h1>` tag, as the title of the page will be taken from the `metadata.json` file. Instead, the highest level heading should be `<h2>`.
 * The html content should avoid using `style` where possible, as styling with be handled by a global stylesheet on the platform. If styling is needed, try to use semantic html tags where possible (e.g. `<em>` for emphasis, `<strong>` for strong emphasis) rather than using `style` attributes. 
 * For images, specify the width and height attributes to help with page layout, but avoid using `style` attributes to set the size of images.
+* For non-interactive code blocks, use the `<pre><code>` tags to format the code. If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="python">` for Python code). This will allow for syntax highlighting on the platform.
+* Interactive Python code cells are supported in the platform and should be included inside the `<py-cell>` tag. For example:
+```html<py-cell>
+print("Hello, world!")
+</py-cell>
+```
+* Interactive R code cells are supported in the platform and should be included inside the `<r-cell>` tag. For example:
+```html<r-cell>
+print("Hello, world!")
+</r-cell>
+```
 
 ## `metadata.json` file
 
