@@ -9,7 +9,7 @@ This file contains the content as it will appear on the page. It should be writt
 * The html content should avoid using `style` where possible, as styling with be handled by a global stylesheet on the platform. If styling is needed, try to use semantic html tags where possible (e.g. `<em>` for emphasis, `<strong>` for strong emphasis) rather than using `style` attributes. 
 * For images, specify the width and height attributes to help with page layout, but avoid using `style` attributes to set the size of images.
 * For non-interactive code blocks, use the `<pre><code>` tags to format the code.
-* When including code snippets ot literal values (in the programming sense), use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`.
+* When including code snippets ot literal values (in the programming sense) in paragraphs of prose, use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`. For numeric values, use <code> tags where it is referring to the character in the code, but omit it if referring to the numeric value.
 * If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="python">` for Python code). This will allow for syntax highlighting on the platform.
 * Interactive Python code cells are supported in the platform and should be included inside the `<py-cell>` tag. For example:
 ```html<py-cell>
