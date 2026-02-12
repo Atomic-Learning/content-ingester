@@ -19,6 +19,7 @@ print("Hello, world!")
 print("Hello, world!")
 </r-cell>
 ```
+* Mathematical content may be rendered in mathmode using a single $ to enclose inline maths or $$ to enclose display maths. For example, $E=mc^2$ or $$E=mc^2$$. The platform uses MathJax to render mathematical content, so any syntax supported by MathJax can be used in the content.
 
 ### Guidance for Sample Solutions for Coding Problems
 
