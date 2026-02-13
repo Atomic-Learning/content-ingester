@@ -42,6 +42,7 @@ To achieve these goals, the following atomisation strategy is recommended:
   - Use consistent slug naming: `exercise-<language>-<topic>` and `sample-solution-<language>-<topic>` for language-specific exercises.
   - Sample solutions should have the prefix "Sample Solution: " and list the related exercise as a prerequisite.
   - When possible, extract concrete exercises directly from the source material rather than creating generic placeholders.
+  - If an exercise relates to a particular piece of content, it should be noted as a related piece of content on that page. The sample solution need not be noted as related content on the main content page, but should have the main content page as a prerequisite.
 
 ### Examples and Example Pages
 * Some pages will be examples that demonstrate an application of a concept. If these contain specific content fabricated for the example (e.g. showing how to solve a particular abstract ODE), then the page title should begin with the prefix "Example: ". Generally, other pages will not use Examples as a prerequisite.
