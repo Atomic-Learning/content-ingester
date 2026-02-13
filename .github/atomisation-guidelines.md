@@ -30,7 +30,7 @@ To achieve these goals, the following atomisation strategy is recommended:
 
 ### Prerequisites vs Related Content
 * **Prerequisite**: Content that a learner *cannot understand the main learning objective of this page without first learning*. Prerequisites are barriers—learners must satisfy them before the page makes sense.
-* **Related Content**: Content that provides context, extension, or additional examples that *enhance understanding but are not strictly necessary*. Examples: a page introducing matplotlib might link to a page about open-source software, or a page on lists might link to exercises demonstrating list operations. Learners can understand the main concept without related content.
+* **Related Content**: Content that provides context, extension, or additional examples that *enhance understanding but are not strictly necessary*. Examples: a page introducing matplotlib might link to a page about open-source software, or a page on lists might link to exercises demonstrating list operations. Learners can understand the main concept without related content. When Page A has Page B as a prerequisite, consider whether Page B should note Page A as a piece of related content to help learners discover it.
 * **When in doubt, use Related Content**: If a learner can grasp the main learning objective without knowing something, it should be related content. This prevents unnecessary prerequisites from blocking access.
 
 ### Naming and Tagging Conventions

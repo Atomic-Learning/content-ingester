@@ -14,7 +14,7 @@ Other files in the `inputs` directory will contain content that is not yet in th
 * Jupyter notebook: You can read this with no special steps.
 If an unsupported file format is present, ask the user.
 
-You should read through this content and propose a structure for how it could be broken down into atomic pages. Detailed guidelines are presented in the file `.github/atomisation-guidelines.md`. You should write this structure into a file named `proposed_structure.md` in the `outputs` directory. This structure should include the title of each proposed page, a description of what it will cover, the pre-requisites for each page, and proposed tags for each page. Highlight any new tags to add to the platform in a separate section.
+You should read through this content and propose a structure for how it could be broken down into atomic pages. Detailed guidelines are presented in the file `.github/atomisation-guidelines.md`. You should write this structure into a file named `proposed_structure.md` in the `outputs` directory. This structure should include the title of each proposed page, a description of what it will cover, the pre-requisites for each page, the related content for each page, and proposed tags for each page. Highlight any new tags to add to the platform in a separate section.
 
 In some cases, there may be content which might be expected to be in the platform as a pre-requisite of the new content, but which is not yet in the platform. In this case, you should also propose the creation of this pre-requisite content and include it in a separate section of the `proposed_structure.md` file.
 
