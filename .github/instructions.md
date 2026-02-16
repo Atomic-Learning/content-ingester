@@ -47,3 +47,7 @@ You should create the content pages according to the agreed structure and fill i
 
 ## Iterate the new content pages with the user.
 Report to the user when the pages have been created. Highlight any area where you've added substantial new content or made significant changes to the original content. Ask the user to review the new pages and provide feedback. You should be prepared to make changes to the pages based on the user's feedback, and you should work with them to refine the pages until they are happy with them.
+
+## Step 5. Check for consistency
+
+In the above process, many pages may have been added, removed, renamed, edited, etc. You should check each metadata file to ensure that the pre-requisites and related content are consistent with the new structure and page names. Recall page names may be pages created in this workflow, or pages that already existed in the platform, specified in `current_content.md`. Also check that the slug in each metadata file matches the directory name of the page. You should also check that any new tags proposed are consistent across pages and with the existing tags in `tags_current.md`. You should work with the user to resolve any inconsistencies that you find.
