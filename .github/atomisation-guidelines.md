@@ -37,7 +37,7 @@ To achieve these goals, the following atomisation strategy is recommended:
 
 ### Granularity: When to Split vs. Combine
 * **Default to splitting**: When in doubt, create separate pages rather than combining content. It is easier for users to access multiple related pages than to navigate past irrelevant content within a single page. This is especially true for:
-  - **Methods/Functions**: Each distinct method or function (e.g., `append()`, `insert()`, `pop()`) should generally have its own page focused on its specific purpose and usage. Avoid combining multiple methods unless they are truly complementary operations with a shared conceptual foundation.
+  - **Methods/Functions**: Each distinct method or function (e.g., `append`, `insert`, `pop`) should generally have its own page focused on its specific purpose and usage. Avoid combining multiple methods unless they are truly complementary operations with a shared conceptual foundation.
   - **Related operations**: Variations of a concept (e.g., "String Concatenation", "String Multiplication", "String Length") should be on separate pages with distinct learning objectives, not grouped on a single page.
   - **Different aspects of a concept**: If a concept has multiple facets (e.g., defining functions vs. calling functions, shallow copy vs. deep copy), each should have its own page with clear naming to distinguish them.
 * **Combine only when truly inseparable**: Two concepts should be on the same page only if understanding one is impossible without simultaneously understanding the other. For example, basic arithmetic operations (add, subtract, multiply, divide) might reasonably be on a single page when teaching a single foundational concept, but operations like string concatenation and string multiplication should each have distinct pages with their own learning objectives.
@@ -53,7 +53,6 @@ To achieve these goals, the following atomisation strategy is recommended:
 * **Mathematical/conceptual foundation pages**: Use domain-specific tags (e.g., `maths`, `physics`). These precede domain-specific implementation pages.
 * **Related pages with consistent patterns**: When creating multiple pages that cover variations of a concept (e.g., string operations, list methods), use a consistent naming pattern in the slug to make relationships clear. For example:
   - `python-strings-concatenation`, `python-strings-multiplication`, `python-strings-length` all follow the pattern `python-strings-<operation>`
-  - `python-lists-methods-append`, `python-lists-methods-insert` (if grouping by type in the name) or `python-list-append`, `python-list-insert` (if using simpler naming)
   - Choose a consistent pattern and apply it throughout a content area to help users recognize related pages.
 * **Exercise and Sample Solution naming**:
   - Exercises should have the prefix "Exercise: " in the title and be language/context-specific when appropriate (e.g., "Exercise: Python List Operations").
