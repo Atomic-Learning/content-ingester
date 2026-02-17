@@ -12,7 +12,7 @@ This file contains the content as it will appear on the page. It should be writt
 * For non-interactive code blocks, use the `<pre><code>` tags to format the code.
 * When adding <pre><code> blocks, do not insert line breaks directly after the opening `<code>` tag or directly before the closing `</code>` tag, as this can cause unwanted whitespace in the rendered content.
 * When including code snippets or literal values (in the programming sense) in paragraphs of prose, use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`. For numeric values, use <code> tags where it is referring to the character in the code, but omit it if referring to the numeric value.
-* If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="language-python">` for Python code). This will allow for syntax highlighting on the platform.
+* If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="language-python">` for Python code). This will allow for syntax highlighting on the platform. If code is pseudocode, do not specify a class.
 * Interactive Python code cells are supported in the platform and should be included inside the `<py-cell>` tag. For example:
 ```html<py-cell>
 print("Hello, world!")
