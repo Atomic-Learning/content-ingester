@@ -168,12 +168,13 @@ def push_page_to_repository(page_path: Path, repo_info: dict, token: str):
         Exception: If git operations fail
     """
     try:
+        target_branch = "main"
         git_dir = page_path / ".git"
         
         # Initialize git repository in the page directory if not already one
         if not git_dir.exists():
             print("  Initializing git repository...")
-            repo = Repo.init(str(page_path))
+            repo = Repo.init(str(page_path), initial_branch=target_branch)
             
             # Set remote
             auth_url = get_git_credentials_url(token, repo_info["clone_url"])
@@ -189,6 +190,12 @@ def push_page_to_repository(page_path: Path, repo_info: dict, token: str):
             except Exception:
                 pass
             repo.create_remote("origin", auth_url)
+
+        # Ensure the target branch exists and is checked out
+        try:
+            repo.git.checkout(target_branch)
+        except Exception:
+            repo.git.checkout("-B", target_branch)
         
         # Stage all files
         repo.git.add('.')
@@ -203,7 +210,7 @@ def push_page_to_repository(page_path: Path, repo_info: dict, token: str):
         # Push to remote
         print("  Pushing to remote...")
         origin = repo.remote("origin")
-        origin.push(set_upstream=True)
+        origin.push(f"{target_branch}:{target_branch}", set_upstream=True)
         print(f"  [OK] Pushed to {repo_info['url']}")
         
     except Exception as e:

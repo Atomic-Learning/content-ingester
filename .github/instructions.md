@@ -118,6 +118,7 @@ python tools/github_uploader.py Atomic-Learning -d path/to/outputs --force
 * Creates a repository for each page using the page slug as the repository name (e.g., `python-methods`)
 * Initializes a git repository in each page directory (outputs/page_slug/.git)
 * Stages all page content and pushes it to the remote repository
+* Uses the `main` branch for new repositories and pushes content to `main`
 * Reports on successfully created repositories, skipped repositories (already exist), and any errors
 * Generates `upload_summary.txt` in the outputs directory with a summary of the upload results
 * Leaves the page directories with their own `.git` folder, ready to be used as local repositories immediately
