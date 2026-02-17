@@ -23,6 +23,7 @@ print("Hello, world!")
 ```
 * Interactive code cells should be used where it would be useful for the user to be able to run the code and see the output for themselves. In these cases, the code does not need comments preempting the output.
 * Mathematical content may be rendered in mathmode using a single $ to enclose inline maths or $$ to enclose display maths. For example, $E=mc^2$ or $$E=mc^2$$. The platform uses MathJax to render mathematical content, so any syntax supported by MathJax can be used in the content.
+* When rendered a mathematical derivation or a sequence of logical steps, it can be helpful to break the content into a sequence of steps, consider using the `aligned` environment to break the content into multiple lines and align it at the equals sign or other relevant symbol.
 * When pseudocode is used to demonstrate programming concepts in a language-agnostic way, the corresponding metadata file should include the "pseudocode" tag.
 * Avoid adding "Summary", "Key Takeaways", or similar sections at the end of the content. These pages will generally be short enough that summaries shouldn't be necessary.
 
