@@ -5,6 +5,25 @@ This workspace is designed to support the creation of these pages from pre-exist
 
 Your goal is to work with the user to process content from the `inputs` directory and create the corresponding "atomic" pages in the `outputs` directory. This will follow a number of steps, which you should guide the user through. At any step, if something is unclear, ask the user. The steps are as follows:
 
+## 0. Set up the Python environment.
+Before proceeding with the workflow, set up a Python virtual environment to manage dependencies for the tools used in this workspace.
+
+Create a Python virtual environment if one doesn't already exist:
+```bash
+python -m venv venv
+```
+
+Activate the virtual environment:
+* On Windows: `.\venv\Scripts\activate`
+* On macOS/Linux: `source venv/bin/activate`
+
+Install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+You should keep the virtual environment activated throughout your work session, as it will be needed for tools like `github_downloader.py` and `github_uploader.py`.
+
 ## 1. Understand existing content and user preferences.
 In the `inputs` directory there will be a file named `current_content.md` or some variant on that name. This file contains a list of the content that currently exists in the platform, along with a description, and the pre-requisites for each piece of content. You should read through this file and understand the content that currently exists. The file `tags_current.md` (or similarly named filed) describes the names of tags which currently exist in the platform, which you should also read through and understand.
 
@@ -43,7 +62,14 @@ Once the structure is agreed, re-check `proposed_structure.md` as the user may h
 
 The format of the files is specified in the GitHub repo https://github.com/Atomic-Learning/content-template . You can download this to the `/templates` directory in this repo and use it as a reference for how to create the content pages using tools/github_downloader.py to download the template repo and copy the relevant files. This should be done once before creating the first page's content. At a basic level, `content.html` contains the content of the page, `metadata.json` contains the metadata for the page (including the title, description, and pre-requisites). The resources directory is where any resources (e.g. images, data files) for the page should be stored. Further instructions on the format of the content can be found in `.github/content_file_details.md`. You should follow these instructions when creating the content pages.
 
-You should create the content pages according to the agreed structure and fill in the content and metadata for each page. Each new page should go in its own directory in the `outputs` directory, titled by its slug. Where possible, you should try to reuse text and examples from the `inputs` directory, but you may need to rewrite it to fit the format of the atomic pages. You should also make sure to include any resources that are needed for the page.
+**Required files for each page:**
+* `metadata.json` - Page metadata
+* `content.html` - Page content
+* `license.md` - License file (copy from `templates/license.md`)
+* `resources/` directory (can be empty or contain images/data files)
+* `resources/placeholder.txt` - Empty placeholder file (copy from `templates/resources/placeholder.txt`)
+
+You should create the content pages according to the agreed structure and fill in the content and metadata for each page. Each new page should go in its own directory in the `outputs` directory, titled by its slug. Where possible, you should try to reuse text and examples from the `inputs` directory, but you may need to rewrite it to fit the format of the atomic pages. You should also make sure to include any resources that are needed for the page, along with the required `license.md` and `resources/placeholder.txt` files mentioned above.
 
 ## Iterate the new content pages with the user.
 Report to the user when the pages have been created. Highlight any area where you've added substantial new content or made significant changes to the original content. Ask the user to review the new pages and provide feedback. You should be prepared to make changes to the pages based on the user's feedback, and you should work with them to refine the pages until they are happy with them.
@@ -54,3 +80,69 @@ In the above process, many pages may have been added, removed, renamed, edited, 
 
 ## 6. Recommend related content for existing pages.
 Finally, you should check the existing pages in `current_content.md` to see if any of the newly created pages should be added as related content to any of the existing pages. You should create a file named `related_content_recommendations.md` in the `outputs` directory where you list any recommendations for related content to be added to existing pages. You should share this file with the user and work with them to refine it until they are happy with it. The user may then choose to update the existing pages in the platform to include the new related content.
+
+## 7. Upload pages to GitHub repositories.
+Once the content pages have been created and reviewed, they should be uploaded to individual repositories in the Atomic Learning GitHub organization. Each page will have its own repository with the page content, metadata, and resources.
+
+To upload the pages, use the `tools/github_uploader.py` script. This script:
+* Discovers all pages in the `outputs` directory (identified by the presence of a `metadata.json` file)
+* Creates new repositories in the specified GitHub organization if they don't already exist (named using the page slug, e.g., `python-methods`)
+* Initializes each page directory as its own git repository and pushes content to the remote
+* Leaves the `.git` directory in place in each page directory, making them immediately usable as local repositories
+
+Before uploading, ensure:
+* Your GitHub Personal Access Token (PAT) is stored in a `.env` file in the project root: `GITHUB_PAT=your_token_here`
+* Your PAT has permissions to create repositories in the target organization
+* The organization name is correct (e.g., `Atomic-Learning`)
+* Your Python virtual environment is activated (created in Step 0)
+
+**Usage:**
+
+First, do a dry run to see what would be uploaded without making any changes:
+```bash
+python tools/github_uploader.py Atomic-Learning --dry-run
+```
+
+If there are significant problems, pause and report these to the user to fix before proceeding. Once you're ready, you can perform the actual upload with the `--force` flag:
+
+```bash
+python tools/github_uploader.py Atomic-Learning --force
+```
+
+You can also specify a different output directory if needed:
+```bash
+python tools/github_uploader.py Atomic-Learning -d path/to/outputs --force
+```
+
+**What the script does:**
+* Creates a repository for each page using the page slug as the repository name (e.g., `python-methods`)
+* Initializes a git repository in each page directory (outputs/page_slug/.git)
+* Stages all page content and pushes it to the remote repository
+* Reports on successfully created repositories, skipped repositories (already exist), and any errors
+* Generates `upload_summary.txt` in the outputs directory with a summary of the upload results
+* Leaves the page directories with their own `.git` folder, ready to be used as local repositories immediately
+
+If a repository already exists with the same name, the script will skip it and report it as skipped. To re-upload to an existing repository, you would need to manually handle that or remove the repository from the organization first.
+
+**Post-Upload: Set Up Local Git Repositories**
+
+After uploading, you should set up local git repositories in each page directory. This allows you to iterate on pages locally and push changes back to GitHub. Use the `tools/github_setup_local_repos.py` script:
+
+First, do a dry run to preview:
+```bash
+python tools/github_setup_local_repos.py Atomic-Learning --dry-run
+```
+
+Then set up the local repositories:
+```bash
+python tools/github_setup_local_repos.py Atomic-Learning --force
+```
+
+This script will:
+* Discover all pages in the `outputs` directory
+* Initialize a local git repository in each page directory (if not already present)
+* Configure the GitHub repository as the `origin` remote
+* Fetch the latest content from GitHub
+* Check out the master branch
+
+After this step, each page directory will be a fully functional git repository with the GitHub repository configured as the origin remote. You can now make local edits, commit changes, and push them back to GitHub using standard git commands.
