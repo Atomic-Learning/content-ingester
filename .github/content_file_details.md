@@ -4,6 +4,7 @@ This file contains a more detailed specification of the format of content that s
 
 This file contains the content as it will appear on the page. It should be written in html format. There are several rules which should be followed:
 
+* If creating new content or editing existing content, use UK English (e.g. "organisation" instead of "organization", "colour" instead of "color", etc.) to maintain consistency with existing content. An exception to this is when quoting or referring to specific content that uses US English (such as names of functions in programming contexts), in which case the original spelling should be retained.
 * The page must not contain a `<h1>` tag, as the title of the page will be taken from the `metadata.json` file and inserted as a `<h1>` automatically by the platform. Most tags in the `content.html` files will be `<h2>`, but `<h3>` or lower tags may be nested within them where appropriate.
 * Do not repeat the page title as a heading in the content. 
 * The html content should avoid using `style` where possible, as styling with be handled by a global stylesheet on the platform. If styling is needed, try to use semantic html tags where possible (e.g. `<em>` for emphasis, `<strong>` for strong emphasis) rather than using `style` attributes. 
