@@ -9,8 +9,8 @@ This file contains the content as it will appear on the page. It should be writt
 * The html content should avoid using `style` where possible, as styling with be handled by a global stylesheet on the platform. If styling is needed, try to use semantic html tags where possible (e.g. `<em>` for emphasis, `<strong>` for strong emphasis) rather than using `style` attributes. 
 * For images, specify the width and height attributes to help with page layout, but avoid using `style` attributes to set the size of images.
 * For non-interactive code blocks, use the `<pre><code>` tags to format the code.
-* When including code snippets ot literal values (in the programming sense) in paragraphs of prose, use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`. For numeric values, use <code> tags where it is referring to the character in the code, but omit it if referring to the numeric value.
-* If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="python">` for Python code). This will allow for syntax highlighting on the platform.
+* When including code snippets or literal values (in the programming sense) in paragraphs of prose, use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`. For numeric values, use <code> tags where it is referring to the character in the code, but omit it if referring to the numeric value.
+* If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="language-python">` for Python code). This will allow for syntax highlighting on the platform.
 * Interactive Python code cells are supported in the platform and should be included inside the `<py-cell>` tag. For example:
 ```html<py-cell>
 print("Hello, world!")
@@ -21,6 +21,7 @@ print("Hello, world!")
 print("Hello, world!")
 </r-cell>
 ```
+* Interactive code cells should be used where it would be useful for the user to be able to run the code and see the output for themselves. In these cases, the code does not need comments preempting the output.
 * Mathematical content may be rendered in mathmode using a single $ to enclose inline maths or $$ to enclose display maths. For example, $E=mc^2$ or $$E=mc^2$$. The platform uses MathJax to render mathematical content, so any syntax supported by MathJax can be used in the content.
 * When pseudocode is used to demonstrate programming concepts in a language-agnostic way, the corresponding metadata file should include the "pseudocode" tag.
 * Avoid adding "Summary", "Key Takeaways", or similar sections at the end of the content. These pages will generally be short enough that summaries shouldn't be necessary.
