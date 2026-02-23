@@ -25,7 +25,7 @@ pip install -r requirements.txt
 You should keep the virtual environment activated throughout your work session, as it will be needed for tools like `github_downloader.py` and `github_uploader.py`.
 
 ## 1. Understand existing content and user preferences.
-In the `inputs` directory there will be a file named `current_content.md` or some variant on that name. This file contains a list of the content that currently exists in the platform, along with a description, and the pre-requisites for each piece of content. You should read through this file and understand the content that currently exists. The file `tags_current.md` (or similarly named filed) describes the names of tags which currently exist in the platform, which you should also read through and understand.
+In the `inputs` directory there will be a file named `current_content.md` or some variant on that name. This file contains a list of the content that currently exists in the platform, along with a description, and the pre-requisites for each piece of content. You should read through this file and understand the content that currently exists. Some pieces of content may have Related Content slugs which do not correspond to existing content slugs - these are placeholders that indicate content that is expected to be added at some point in the future (possibly but no necessarily while this tool is running). The file `tags_current.md` (or similarly named filed) describes the names of tags which currently exist in the platform, which you should also read through and understand.
 
 ## 2. Identify new content and propose structure.
 Other files in the `inputs` directory will contain content that is not yet in the platform. This could be in a number of formats:
