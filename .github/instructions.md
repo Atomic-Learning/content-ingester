@@ -72,7 +72,7 @@ The format of the files is specified in the GitHub repo https://github.com/Atomi
 You should create the content pages according to the agreed structure and fill in the content and metadata for each page. Each new page should go in its own directory in the `outputs` directory, titled by its slug. Where possible, you should try to reuse text and examples from the `inputs` directory, but you may need to rewrite it to fit the format of the atomic pages. You should also make sure to include any resources that are needed for the page, along with the required `license.md` and `resources/placeholder.txt` files mentioned above.
 
 ## Iterate the new content pages with the user.
-Report to the user when the pages have been created. Highlight any area where you've added substantial new content or made significant changes to the original content. Ask the user to review the new pages and provide feedback. You should be prepared to make changes to the pages based on the user's feedback, and you should work with them to refine the pages until they are happy with them.
+Report to the user when the pages have been created. Highlight any area where you've added substantial new content or made significant changes to the original content. Ask the user to review the new pages and provide feedback. You should be prepared to make changes to the pages based on the user's feedback, and you should work with them to refine the pages until they are happy with them. When creating new content, periodically review `content_file_details.md` to ensure you are following the guidelines for how to format the content in the revised pages.
 
 ## Step 5. Check for consistency
 
