@@ -33,15 +33,27 @@ Other files in the `inputs` directory will contain content that is not yet in th
 * Jupyter notebook: You can read this with no special steps.
 If an unsupported file format is present, ask the user.
 
-You should read through this content and propose a structure for how it could be broken down into atomic pages. Detailed guidelines are presented in the file `.github/atomisation-guidelines.md`. You should write this structure into a file named `proposed_structure.md` in the `outputs` directory. This structure should include the title of each proposed page, a description of what it will cover, the pre-requisites for each page, the related content for each page, and proposed tags for each page. Highlight any new tags to add to the platform in a separate section.
+You should read through this content and propose a structure for how it could be broken down into atomic pages. Detailed guidelines are presented in the file `.github/atomisation-guidelines.md`. The required Step 2 output format is defined in `.github/proposed-structure-format.md`.
 
-In some cases, there may be content which might be expected to be in the platform as a pre-requisite of the new content, but which is not yet in the platform. In this case, you should also propose the creation of this pre-requisite content and include it in a separate section of the `proposed_structure.md` file.
+You should write this structure into a file named `proposed_structure.json` in the `outputs` directory. This JSON file is the canonical Step 2 output and should contain the full proposal details, including inputs reviewed, user preferences applied, proposed pages, proposed missing prerequisites, omitted source sections, tag review, and checkpoint review.
 
-If content in the content being converted overlaps existing content, the existing content should not be updated - it can left as-is. Summarise sections of the provided files which will not be included in the new pages in the `proposed_structure.md` file, and explain why they will not be included.
+Highlight any new tags to add to the platform in a separate section.
+
+In some cases, there may be content which might be expected to be in the platform as a pre-requisite of the new content, but which is not yet in the platform. In this case, you should also propose the creation of this pre-requisite content and include it in the `proposed_missing_prerequisites` section of `proposed_structure.json`.
+
+If content in the content being converted overlaps existing content, the existing content should not be updated - it can left as-is. Summarise sections of the provided files which will not be included in the new pages in `proposed_structure.json`, and explain why they will not be included.
 
 Circular dependencies should be avoided in your proposed structure.
 
 For large collections of input file, the process may produce dozens of new pages.
+
+After producing `proposed_structure.json`, generate the Step 2 dependency graph using:
+
+```bash
+python tools/generate_prerequisite_graph.py --source proposed_structure
+```
+
+Point out the existence of `proposed_structure.json` and the generated dependency graph to the user for their review.
 
 ### Proposed Structure Checkpoints
 Before finalizing the proposed structure, verify:
@@ -53,12 +65,12 @@ Before finalizing the proposed structure, verify:
 * **Tags**: Are language-agnostic pages tagged `programming`, language-specific pages tagged with the language name only, and conceptual foundations tagged appropriately (e.g., `maths`)?
 
 ## 3. Iterate with the user to refine the proposed structure.
-You should share the `proposed_structure.md` file with the user and discuss it with them. They may have suggestions for how to improve the structure, or they may want to change the proposed pre-requisites. You should work with them to refine the structure until you are both happy with it. The user may prompt you to make changes or edit the file directly. 
+You should share the `proposed_structure.json` file with the user and discuss it with them. They may have suggestions for how to improve the structure, or they may want to change the proposed pre-requisites. You should work with them to refine the structure until you are both happy with it. The user may prompt you to make changes or edit the file directly. 
 
 Before concluding this step, remind the user of the key atomisation principles (language-agnostic foundations, single learning objectives, concrete exercises, tagging conventions) to check whether they want any final refinements. 
 
 ## 4. Create the content pages.
-Once the structure is agreed, re-check `proposed_structure.md` as the user may have edited it directly. Use this opportunity to verify that the structure aligns with the key atomisation principles: language-agnostic foundations precede language-specific implementations (if applicable), pages have single learning objectives, exercises are concrete and extracted from source material, and tagging conventions are followed. If there are pages which you have proposed as pre-requisites but which are not yet in the platform, you should also ask if the user would like to create these themselves or if they would like you to create them. You should also ask the user who should be credited as the author for the pages as it appears in the metadata for the page. The user will judge who should be the author.
+Once the structure is agreed, re-check `proposed_structure.json` as the user may have edited it directly. Use this opportunity to verify that the structure aligns with the key atomisation principles: language-agnostic foundations precede language-specific implementations (if applicable), pages have single learning objectives, exercises are concrete and extracted from source material, and tagging conventions are followed. If there are pages which you have proposed as pre-requisites but which are not yet in the platform, you should also ask if the user would like to create these themselves or if they would like you to create them. You should also ask the user who should be credited as the author for the pages as it appears in the metadata for the page. The user will judge who should be the author.
 
 The format of the files is specified in the GitHub repo https://github.com/Atomic-Learning/content-template . You can download this to the `/templates` directory in this repo and use it as a reference for how to create the content pages using tools/github_downloader.py to download the template repo and copy the relevant files. This should be done once before creating the first page's content. At a basic level, `content.html` contains the content of the page, `metadata.json` contains the metadata for the page (including the title, description, and pre-requisites). The resources directory is where any resources (e.g. images, data files) for the page should be stored. Further instructions on the format of the content can be found in `.github/content_file_details.md`. You should follow these instructions when creating the content pages.
 

@@ -1,100 +1,414 @@
+import argparse
 import json
+import re
 from pathlib import Path
-import networkx as nx
-import matplotlib.pyplot as plt
+from typing import Dict, List, Optional, Set, Tuple
 
-OUTPUTS_DIR = Path(__file__).parent.parent / "outputs"
-INPUTS_DIR = Path(__file__).parent.parent / "inputs"
-GRAPH_PATH = OUTPUTS_DIR / "prerequisite_graph.png"
-
-NEW_COLOR = "#b6e7a7"  # light green
-EXISTING_COLOR = "#cccccc"  # light gray
-FONT_COLOR = "red"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_INPUTS_DIR = ROOT_DIR / "inputs"
+DEFAULT_OUTPUTS_DIR = ROOT_DIR / "outputs"
+DEFAULT_GRAPH_MARKDOWN = DEFAULT_OUTPUTS_DIR / "dependency_graph.md"
 
 
-def get_existing_slugs():
-    current_content = INPUTS_DIR / "current_content.md"
-    slugs = set()
-    if not current_content.exists():
+def detect_existing_content_file(inputs_dir: Path) -> Optional[Path]:
+    candidates: List[Path] = []
+    patterns = [
+        "current_content.md",
+        "*current_content*.md",
+        "content-export*.md",
+        "*content*export*.md",
+    ]
+
+    for pattern in patterns:
+        candidates.extend(inputs_dir.glob(pattern))
+
+    unique_files = sorted(set(candidates), key=lambda p: p.name.lower())
+    if not unique_files:
+        return None
+
+    # Prefer exact current_content naming when present.
+    exact = [p for p in unique_files if p.name.lower() == "current_content.md"]
+    if exact:
+        return exact[0]
+
+    return unique_files[0]
+
+
+def parse_existing_slugs(content_file: Optional[Path]) -> Set[str]:
+    slugs: Set[str] = set()
+    if content_file is None or not content_file.exists():
         return slugs
-    with open(current_content, encoding="utf-8") as f:
-        for line in f:
-            if line.strip().startswith("- slug: "):
-                slug = line.strip().split(":", 1)[1].strip()
-                slugs.add(slug)
+
+    slug_line_pattern = re.compile(r"^\s*-\s*slug:\s*([^\s]+)\s*$")
+    heading_pattern = re.compile(r"^##\s+([^\s]+)\s*$")
+
+    with content_file.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            slug_match = slug_line_pattern.match(line)
+            if slug_match:
+                slugs.add(slug_match.group(1).strip())
+                continue
+
+            heading_match = heading_pattern.match(line)
+            if heading_match:
+                slugs.add(heading_match.group(1).strip())
+
     return slugs
 
 
-def get_new_pages():
-    pages = {}
-    for page_dir in OUTPUTS_DIR.iterdir():
-        if not page_dir.is_dir():
+def _extract_slug_list(raw_text: str) -> List[str]:
+    found = re.findall(r"`([^`]+)`", raw_text)
+    if found:
+        return [item.strip() for item in found if item.strip()]
+
+    # Fallback to comma-separated plain text entries.
+    values: List[str] = []
+    for part in raw_text.split(","):
+        cleaned = part.strip()
+        cleaned = re.sub(r"\*", "", cleaned)
+        cleaned = re.sub(r"\s*\([^)]*\)\s*$", "", cleaned)
+        cleaned = cleaned.strip("` ")
+        if cleaned:
+            values.append(cleaned)
+    return values
+
+
+def parse_proposed_structure_json(proposed_file: Path) -> Tuple[Dict[str, List[str]], Set[str]]:
+    with proposed_file.open("r", encoding="utf-8-sig") as handle:
+        payload = json.load(handle)
+
+    return _parse_structured_graph_payload(payload)
+
+
+def _extract_structured_graph_data(markdown_text: str) -> Optional[dict]:
+    section_pattern = re.compile(
+        r"^##\s+Structured Data for Tools\s*$",
+        flags=re.IGNORECASE | re.MULTILINE,
+    )
+    section_match = section_pattern.search(markdown_text)
+    if not section_match:
+        return None
+
+    section_text = markdown_text[section_match.end():]
+    code_block_pattern = re.compile(r"```json\s*(\{.*?\})\s*```", flags=re.DOTALL | re.IGNORECASE)
+    block_match = code_block_pattern.search(section_text)
+    if not block_match:
+        return None
+
+    try:
+        payload = json.loads(block_match.group(1))
+    except json.JSONDecodeError:
+        return None
+
+    if not isinstance(payload, dict):
+        return None
+    return payload
+
+
+def _parse_structured_graph_payload(payload: dict) -> Tuple[Dict[str, List[str]], Set[str]]:
+    pages: Dict[str, List[str]] = {}
+    proposed_missing: Set[str] = set()
+
+    raw_pages = payload.get("pages", [])
+    if isinstance(raw_pages, list):
+        for entry in raw_pages:
+            if not isinstance(entry, dict):
+                continue
+            slug = entry.get("slug")
+            if not isinstance(slug, str) or not slug.strip():
+                continue
+            prerequisites = entry.get("prerequisites", [])
+            if not isinstance(prerequisites, list):
+                prerequisites = []
+            normalized_prereqs = [str(item).strip() for item in prerequisites if str(item).strip()]
+            pages[slug.strip()] = normalized_prereqs
+
+    raw_missing = payload.get("proposed_missing_prerequisites", [])
+    if isinstance(raw_missing, list):
+        for entry in raw_missing:
+            if isinstance(entry, dict):
+                slug = entry.get("slug")
+                if isinstance(slug, str) and slug.strip():
+                    proposed_missing.add(slug.strip())
+
+    return pages, proposed_missing
+
+
+def parse_proposed_structure_markdown(proposed_file: Path) -> Tuple[Dict[str, List[str]], Set[str]]:
+    markdown_text = proposed_file.read_text(encoding="utf-8")
+    structured_payload = _extract_structured_graph_data(markdown_text)
+    if structured_payload is not None:
+        structured_pages, structured_missing = _parse_structured_graph_payload(structured_payload)
+        if structured_pages or structured_missing:
+            return structured_pages, structured_missing
+
+    pages: Dict[str, List[str]] = {}
+    proposed_missing: Set[str] = set()
+    current_slug: Optional[str] = None
+    in_missing_section = False
+
+    heading_pattern = re.compile(r"^###\s+\d+\)\s+`([^`]+)`\s*$")
+    missing_item_pattern = re.compile(r"^\s*\d+\)\s+`([^`]+)`\s*$")
+    prereq_pattern = re.compile(r"^\s*-\s+\*\*Prerequisites:\*\*\s*(.*)$")
+
+    for raw_line in markdown_text.splitlines():
+        line = raw_line.rstrip()
+        lower = line.strip().lower()
+
+        if lower.startswith("## proposed prerequisite content not currently in platform"):
+            in_missing_section = True
+            current_slug = None
             continue
-        meta = page_dir / "metadata.json"
-        if not meta.exists():
+
+        if lower.startswith("## ") and not lower.startswith("## proposed prerequisite content not currently in platform"):
+            in_missing_section = False
+
+        if in_missing_section:
+            missing_match = missing_item_pattern.match(line)
+            if missing_match:
+                slug = missing_match.group(1).strip()
+                proposed_missing.add(slug)
             continue
-        with open(meta, encoding="utf-8") as f:
-            data = json.load(f)
-        slug = data.get("slug")
-        prereqs = data.get("prerequisites", [])
-        if slug:
-            pages[slug] = prereqs
+
+        heading_match = heading_pattern.match(line)
+        if heading_match:
+            current_slug = heading_match.group(1).strip()
+            pages.setdefault(current_slug, [])
+            continue
+
+        prereq_match = prereq_pattern.match(line)
+        if prereq_match and current_slug is not None:
+            prereqs = _extract_slug_list(prereq_match.group(1))
+            pages[current_slug] = prereqs
+
+    return pages, proposed_missing
+
+
+def parse_proposed_structure(proposed_file: Path) -> Tuple[Dict[str, List[str]], Set[str]]:
+    if proposed_file.suffix.lower() == ".json":
+        return parse_proposed_structure_json(proposed_file)
+
+    return parse_proposed_structure_markdown(proposed_file)
+
+
+def parse_metadata_pages(metadata_root: Path) -> Dict[str, List[str]]:
+    pages: Dict[str, List[str]] = {}
+
+    for metadata_file in sorted(metadata_root.rglob("metadata.json")):
+        try:
+            with metadata_file.open("r", encoding="utf-8-sig") as handle:
+                payload = json.load(handle)
+        except (json.JSONDecodeError, OSError):
+            continue
+
+        slug = payload.get("slug")
+        prerequisites = payload.get("prerequisites", [])
+
+        if not isinstance(slug, str) or not slug.strip():
+            continue
+        if not isinstance(prerequisites, list):
+            prerequisites = []
+
+        normalized = [str(item).strip() for item in prerequisites if str(item).strip()]
+        pages[slug.strip()] = normalized
+
     return pages
 
 
-def main():
-    new_pages = get_new_pages()
-    all_slugs = set(new_pages.keys())
-    G = nx.DiGraph()
-    # Add nodes
-    for slug in new_pages:
-        G.add_node(slug, color=NEW_COLOR)
-    for slug in set(pr for prereqs in new_pages.values() for pr in prereqs):
-        if slug not in all_slugs:
-            G.add_node(slug, color=EXISTING_COLOR)
-    # Add edges
-    for slug, prereqs in new_pages.items():
-        for pr in prereqs:
-            G.add_edge(pr, slug)
-    num_nodes = len(G.nodes)
-    # Layout: use graphviz_layout if possible, else spring_layout with k
-    try:
-        from networkx.drawing.nx_pydot import graphviz_layout
-        pos = graphviz_layout(G, prog="dot")
-    except Exception:
-        k = 6 / (num_nodes ** 0.5) if num_nodes > 1 else 1
-        pos = nx.spring_layout(G, seed=42, k=k)
-    # Scaling: as node count increases, decrease node/font/arrow size
-    base_node_size = 2500
-    base_font_size = 12
-    base_arrow_size = 25
-    scale = max(0.5, min(1.5, 30 / num_nodes)) if num_nodes > 0 else 1
-    node_size = base_node_size * scale
-    font_size = int(base_font_size * scale)
-    arrow_size = int(base_arrow_size * scale)
-    node_colors = [G.nodes[n].get('color', '#cccccc') for n in G.nodes]
-    plt.figure(figsize=(24, 16))
-    nx.draw(
-        G, pos,
-        with_labels=True,
-        node_color=node_colors,
-        edge_color="#333333",
-        font_size=font_size,
-        font_weight="bold",
-        arrows=True,
-        arrowsize=arrow_size,
-        linewidths=2,
-        width=2,
-        node_size=node_size,
-        connectionstyle='arc3,rad=0.1',
-        labels={n: n for n in G.nodes},
-        font_color=FONT_COLOR
+def _safe_id(raw_slug: str, used_ids: Set[str]) -> str:
+    candidate = re.sub(r"[^a-zA-Z0-9_]", "_", raw_slug)
+    candidate = re.sub(r"_+", "_", candidate).strip("_")
+    if not candidate:
+        candidate = "node"
+    if candidate[0].isdigit():
+        candidate = f"n_{candidate}"
+
+    unique = candidate
+    index = 2
+    while unique in used_ids:
+        unique = f"{candidate}_{index}"
+        index += 1
+
+    used_ids.add(unique)
+    return unique
+
+
+def _classify_nodes(
+    pages: Dict[str, List[str]],
+    existing_slugs: Set[str],
+    proposed_missing: Set[str],
+) -> Tuple[Dict[str, str], List[Tuple[str, str]]]:
+    node_types: Dict[str, str] = {}
+    edges: List[Tuple[str, str]] = []
+
+    for slug in pages:
+        if slug in proposed_missing:
+            node_types[slug] = "missing"
+        else:
+            node_types[slug] = "new"
+
+    for slug, prereqs in pages.items():
+        for prereq in prereqs:
+            if prereq not in node_types:
+                if prereq in proposed_missing:
+                    node_types[prereq] = "missing"
+                else:
+                    node_types[prereq] = "existing" if prereq in existing_slugs else "unknown"
+            edges.append((prereq, slug))
+
+    for missing_slug in proposed_missing:
+        node_types.setdefault(missing_slug, "missing")
+
+    return node_types, edges
+
+
+def build_mermaid(
+    pages: Dict[str, List[str]],
+    existing_slugs: Set[str],
+    proposed_missing: Set[str],
+    direction: str,
+) -> str:
+    node_types, edges = _classify_nodes(pages, existing_slugs, proposed_missing)
+    used_ids: Set[str] = set()
+    slug_to_id: Dict[str, str] = {}
+
+    for slug in sorted(node_types):
+        slug_to_id[slug] = _safe_id(slug, used_ids)
+
+    lines: List[str] = [f"flowchart {direction}"]
+
+    for slug in sorted(node_types):
+        node_id = slug_to_id[slug]
+        label = slug.replace('"', "'")
+        lines.append(f'    {node_id}["{label}"]')
+
+    for source, target in sorted(set(edges)):
+        source_id = slug_to_id[source]
+        target_id = slug_to_id[target]
+        lines.append(f"    {source_id} --> {target_id}")
+
+    lines.append("")
+    lines.append("    classDef new fill:#b6e7a7,stroke:#2d6a4f,color:#111,stroke-width:1px;")
+    lines.append("    classDef existing fill:#d9d9d9,stroke:#666,color:#111,stroke-width:1px;")
+    lines.append("    classDef missing fill:#ffe8a3,stroke:#946200,color:#111,stroke-width:1px;")
+    lines.append("    classDef unknown fill:#ffd6d6,stroke:#a33,color:#111,stroke-width:1px;")
+
+    grouped: Dict[str, List[str]] = {"new": [], "existing": [], "missing": [], "unknown": []}
+    for slug, kind in node_types.items():
+        grouped[kind].append(slug_to_id[slug])
+
+    for kind in ["new", "existing", "missing", "unknown"]:
+        if grouped[kind]:
+            id_list = ",".join(sorted(grouped[kind]))
+            lines.append(f"    class {id_list} {kind};")
+
+    return "\n".join(lines) + "\n"
+
+
+def write_markdown_wrapper(markdown_file: Path, mermaid_content: str, mode: str) -> None:
+    markdown = (
+        "# Dependency Graph\n\n"
+        f"Generated from mode: {mode}.\n\n"
+        "## Legend\n\n"
+        "- Green: new page in this proposal or content batch\n"
+        "- Grey: existing page already present in platform content\n"
+        "- Yellow: proposed missing prerequisite not yet in platform\n"
+        "- Red: referenced slug not identified as existing or proposed missing\n\n"
+        "```mermaid\n"
+        f"{mermaid_content}"
+        "```\n"
     )
-    plt.title("Prerequisite Graph (Green: New, Gray: Existing)", fontsize=18)
-    plt.tight_layout()
-    plt.savefig(GRAPH_PATH)
-    plt.close()
-    print(f"Graph generated at {GRAPH_PATH}")
+    markdown_file.write_text(markdown, encoding="utf-8")
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate dependency graph markdown as Mermaid from proposed structure or metadata.",
+    )
+    parser.add_argument(
+        "--source",
+        choices=["proposed_structure", "metadata"],
+        default="proposed_structure",
+        help="Graph source: Step 2 proposed_structure.json or Step 5 metadata files.",
+    )
+    parser.add_argument(
+        "--proposed-file",
+        type=Path,
+        default=DEFAULT_OUTPUTS_DIR / "proposed_structure.json",
+        help="Path to proposed_structure JSON file.",
+    )
+    parser.add_argument(
+        "--metadata-root",
+        type=Path,
+        default=DEFAULT_OUTPUTS_DIR,
+        help="Root directory containing page folders with metadata.json files.",
+    )
+    parser.add_argument(
+        "--existing-content-file",
+        type=Path,
+        default=None,
+        help="Optional explicit path to current/existing content export markdown.",
+    )
+    parser.add_argument(
+        "--inputs-dir",
+        type=Path,
+        default=DEFAULT_INPUTS_DIR,
+        help="Inputs directory used to auto-detect existing content file.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=DEFAULT_OUTPUTS_DIR,
+        help="Directory where dependency_graph.md will be written.",
+    )
+    parser.add_argument(
+        "--direction",
+        choices=["TB", "TD", "LR", "RL", "BT"],
+        default="TD",
+        help="Mermaid flow direction.",
+    )
+
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+
+    if args.source == "proposed_structure":
+        if not args.proposed_file.exists():
+            raise FileNotFoundError(f"Proposed structure file not found: {args.proposed_file}")
+        pages, proposed_missing = parse_proposed_structure(args.proposed_file)
+        selected_mode = "proposed"
+    else:
+        pages = parse_metadata_pages(args.metadata_root)
+        proposed_missing = set()
+        selected_mode = "metadata"
+
+    if not pages and not proposed_missing:
+        raise RuntimeError("No pages found to graph. Check input files and mode.")
+
+    existing_content_file = args.existing_content_file
+    if existing_content_file is None:
+        existing_content_file = detect_existing_content_file(args.inputs_dir)
+
+    existing_slugs = parse_existing_slugs(existing_content_file)
+
+    mermaid = build_mermaid(
+        pages=pages,
+        existing_slugs=existing_slugs,
+        proposed_missing=proposed_missing,
+        direction=args.direction,
+    )
+
+    output_markdown_file = args.output_dir / DEFAULT_GRAPH_MARKDOWN.name
+    output_markdown_file.parent.mkdir(parents=True, exist_ok=True)
+    write_markdown_wrapper(output_markdown_file, mermaid, selected_mode)
+
+    print(f"Generated dependency graph markdown: {output_markdown_file}")
+    print(f"Mode: {selected_mode}")
+    print(f"Page count: {len(pages)}")
+    print(f"Existing content file: {existing_content_file if existing_content_file else 'none found'}")
+
 
 if __name__ == "__main__":
     main()

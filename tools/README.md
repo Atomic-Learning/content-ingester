@@ -2,6 +2,49 @@
 
 This directory contains utility scripts for the content ingester project.
 
+## generate_prerequisite_graph.py
+
+A Python script to generate dependency graphs as Mermaid flowcharts.
+
+This script supports two source modes:
+- Step 2 mode: parse `outputs/proposed_structure.json` and generate a planning graph.
+- Step 5 mode: parse `metadata.json` files in page folders and generate a final graph.
+
+The script always writes the same output file:
+- `outputs/dependency_graph.md`
+
+### Usage
+
+Generate from Step 2 proposed structure:
+
+```bash
+python tools/generate_prerequisite_graph.py
+```
+
+Generate from Step 5 metadata files:
+
+```bash
+python tools/generate_prerequisite_graph.py --source metadata
+```
+
+Use explicit source selection for proposed structure:
+
+```bash
+python tools/generate_prerequisite_graph.py --source proposed_structure
+```
+
+Write `dependency_graph.md` to a different output directory:
+
+```bash
+python tools/generate_prerequisite_graph.py --source metadata --output-dir outputs/dummy-tests
+```
+
+Notes:
+- Existing content slugs are auto-detected from `inputs/current_content.md` when present, otherwise from `inputs/content-export*.md`.
+- Output file name is always `dependency_graph.md`.
+- In `--source proposed_structure` mode, the canonical input is `proposed_structure.json`.
+- Legacy markdown proposals are still accepted if explicitly passed via `--proposed-file`.
+
 ## github_downloader.py
 
 A Python script to download GitHub repositories using a Personal Access Token (PAT).
