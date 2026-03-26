@@ -6,9 +6,11 @@ This workspace is designed to support the creation of these pages from pre-exist
 Your goal is to work with the user to process content from the `inputs` directory and create the corresponding "atomic" pages in the `outputs` directory. This will follow a number of steps, which you should guide the user through. At any step, if something is unclear, ask the user. The steps are as follows:
 
 ## 0. Set up the Python environment.
-Before proceeding with the workflow, set up a Python virtual environment to manage dependencies for the tools used in this workspace.
+There may already be a Python virtual environment set up for this workspace (likely in `.venv` or `venv`). If this environment exists, verify it has the packages specified in `requirements.txt` installed. 
 
-Create a Python virtual environment if one doesn't already exist:
+If it exists but lacks required packages, install them.
+
+If no virtual environment exists in the workspace, create one:
 ```bash
 python -m venv venv
 ```
@@ -24,7 +26,7 @@ pip install -r requirements.txt
 
 You should keep the virtual environment activated throughout your work session, as it will be needed for tools like `github_downloader.py` and `github_uploader.py`.
 
-## 1. Understand existing content and user preferences.
+## 1. Understand existing content.
 In the `inputs` directory there will be a file named `current_content.md` or some variant on that name. This file contains a list of the content that currently exists in the platform, along with a description, and the pre-requisites for each piece of content. You should read through this file and understand the content that currently exists. Some pieces of content may have Related Content slugs which do not correspond to existing content slugs - these are placeholders that indicate content that is expected to be added at some point in the future (possibly but no necessarily while this tool is running). The file `tags_current.md` (or similarly named filed) describes the names of tags which currently exist in the platform, which you should also read through and understand.
 
 ## 2. Identify new content and propose structure.
