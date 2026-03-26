@@ -43,7 +43,7 @@ Notes:
 - Existing content slugs are auto-detected from `inputs/current_content.md` when present, otherwise from `inputs/content-export*.md`.
 - Output file name is always `dependency_graph.md`.
 - In `--source proposed_structure` mode, the canonical input is `proposed_structure.json`.
-- Legacy markdown proposals are still accepted if explicitly passed via `--proposed-file`.
+- In proposed structure mode, pages with `status: "missing"` are rendered as missing prerequisites in the graph.
 
 ## github_downloader.py
 

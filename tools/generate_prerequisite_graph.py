@@ -56,53 +56,11 @@ def parse_existing_slugs(content_file: Optional[Path]) -> Set[str]:
     return slugs
 
 
-def _extract_slug_list(raw_text: str) -> List[str]:
-    found = re.findall(r"`([^`]+)`", raw_text)
-    if found:
-        return [item.strip() for item in found if item.strip()]
-
-    # Fallback to comma-separated plain text entries.
-    values: List[str] = []
-    for part in raw_text.split(","):
-        cleaned = part.strip()
-        cleaned = re.sub(r"\*", "", cleaned)
-        cleaned = re.sub(r"\s*\([^)]*\)\s*$", "", cleaned)
-        cleaned = cleaned.strip("` ")
-        if cleaned:
-            values.append(cleaned)
-    return values
-
-
 def parse_proposed_structure_json(proposed_file: Path) -> Tuple[Dict[str, List[str]], Set[str]]:
     with proposed_file.open("r", encoding="utf-8-sig") as handle:
         payload = json.load(handle)
 
     return _parse_structured_graph_payload(payload)
-
-
-def _extract_structured_graph_data(markdown_text: str) -> Optional[dict]:
-    section_pattern = re.compile(
-        r"^##\s+Structured Data for Tools\s*$",
-        flags=re.IGNORECASE | re.MULTILINE,
-    )
-    section_match = section_pattern.search(markdown_text)
-    if not section_match:
-        return None
-
-    section_text = markdown_text[section_match.end():]
-    code_block_pattern = re.compile(r"```json\s*(\{.*?\})\s*```", flags=re.DOTALL | re.IGNORECASE)
-    block_match = code_block_pattern.search(section_text)
-    if not block_match:
-        return None
-
-    try:
-        payload = json.loads(block_match.group(1))
-    except json.JSONDecodeError:
-        return None
-
-    if not isinstance(payload, dict):
-        return None
-    return payload
 
 
 def _parse_structured_graph_payload(payload: dict) -> Tuple[Dict[str, List[str]], Set[str]]:
@@ -121,74 +79,21 @@ def _parse_structured_graph_payload(payload: dict) -> Tuple[Dict[str, List[str]]
             if not isinstance(prerequisites, list):
                 prerequisites = []
             normalized_prereqs = [str(item).strip() for item in prerequisites if str(item).strip()]
-            pages[slug.strip()] = normalized_prereqs
+            clean_slug = slug.strip()
+            pages[clean_slug] = normalized_prereqs
 
-    raw_missing = payload.get("proposed_missing_prerequisites", [])
-    if isinstance(raw_missing, list):
-        for entry in raw_missing:
-            if isinstance(entry, dict):
-                slug = entry.get("slug")
-                if isinstance(slug, str) and slug.strip():
-                    proposed_missing.add(slug.strip())
-
-    return pages, proposed_missing
-
-
-def parse_proposed_structure_markdown(proposed_file: Path) -> Tuple[Dict[str, List[str]], Set[str]]:
-    markdown_text = proposed_file.read_text(encoding="utf-8")
-    structured_payload = _extract_structured_graph_data(markdown_text)
-    if structured_payload is not None:
-        structured_pages, structured_missing = _parse_structured_graph_payload(structured_payload)
-        if structured_pages or structured_missing:
-            return structured_pages, structured_missing
-
-    pages: Dict[str, List[str]] = {}
-    proposed_missing: Set[str] = set()
-    current_slug: Optional[str] = None
-    in_missing_section = False
-
-    heading_pattern = re.compile(r"^###\s+\d+\)\s+`([^`]+)`\s*$")
-    missing_item_pattern = re.compile(r"^\s*\d+\)\s+`([^`]+)`\s*$")
-    prereq_pattern = re.compile(r"^\s*-\s+\*\*Prerequisites:\*\*\s*(.*)$")
-
-    for raw_line in markdown_text.splitlines():
-        line = raw_line.rstrip()
-        lower = line.strip().lower()
-
-        if lower.startswith("## proposed prerequisite content not currently in platform"):
-            in_missing_section = True
-            current_slug = None
-            continue
-
-        if lower.startswith("## ") and not lower.startswith("## proposed prerequisite content not currently in platform"):
-            in_missing_section = False
-
-        if in_missing_section:
-            missing_match = missing_item_pattern.match(line)
-            if missing_match:
-                slug = missing_match.group(1).strip()
-                proposed_missing.add(slug)
-            continue
-
-        heading_match = heading_pattern.match(line)
-        if heading_match:
-            current_slug = heading_match.group(1).strip()
-            pages.setdefault(current_slug, [])
-            continue
-
-        prereq_match = prereq_pattern.match(line)
-        if prereq_match and current_slug is not None:
-            prereqs = _extract_slug_list(prereq_match.group(1))
-            pages[current_slug] = prereqs
+            status = entry.get("status")
+            if isinstance(status, str) and status.strip().lower() == "missing":
+                proposed_missing.add(clean_slug)
 
     return pages, proposed_missing
 
 
 def parse_proposed_structure(proposed_file: Path) -> Tuple[Dict[str, List[str]], Set[str]]:
-    if proposed_file.suffix.lower() == ".json":
-        return parse_proposed_structure_json(proposed_file)
+    if proposed_file.suffix.lower() != ".json":
+        raise ValueError("proposed_structure input must be JSON with pages[].status set to new/missing.")
 
-    return parse_proposed_structure_markdown(proposed_file)
+    return parse_proposed_structure_json(proposed_file)
 
 
 def parse_metadata_pages(metadata_root: Path) -> Dict[str, List[str]]:

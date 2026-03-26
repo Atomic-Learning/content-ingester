@@ -17,7 +17,6 @@ Required top-level keys:
 - `inputs_reviewed`
 - `user_preferences_applied`
 - `pages`
-- `proposed_missing_prerequisites`
 - `omitted_source_sections`
 - `tag_review`
 - `checkpoint_review`
@@ -52,19 +51,20 @@ Required top-level keys:
         "programming"
       ],
       "status": "new"
-    }
-  ],
-  "proposed_missing_prerequisites": [
+    },
     {
       "slug": "python-defining-functions",
-      "why": "Needed as a Python-specific syntax prerequisite.",
-      "suggested_minimal_scope": "Python syntax for function definition, arguments, and return values.",
-      "suggested_prerequisites": [
+      "title": "Python: Defining Functions",
+      "learning_objective": "Write basic Python function definitions with parameters and return values.",
+      "description": "Python syntax foundation required before recursion implementation pages.",
+      "prerequisites": [
         "programming-defining-functions"
       ],
-      "suggested_tags": [
+      "related_content": [],
+      "proposed_tags": [
         "python"
-      ]
+      ],
+      "status": "missing"
     }
   ],
   "omitted_source_sections": [
@@ -106,13 +106,18 @@ Each entry in `pages` must include:
 - `proposed_tags`
 - `status`
 
+Allowed values for `status`:
+
+- `new`: page is derived directly from the provided source content
+- `missing`: page is a proposed prerequisite that bridges a gap between existing platform content and provided source content
+
 ## Notes For Tooling
 
-- The dependency graph tool reads `pages[*].slug`, `pages[*].prerequisites`, and `proposed_missing_prerequisites[*].slug`.
+- The dependency graph tool reads `pages[*].slug`, `pages[*].prerequisites`, and `pages[*].status`.
 - All other fields are preserved so the JSON file can be used directly for review and later content generation steps.
 - Keep slugs and tags as plain strings.
 - Use valid JSON only: double quotes, no trailing commas, no markdown fencing.
 
 ## Backward Compatibility
 
-The graph script still accepts older markdown proposals if explicitly passed, but `outputs/proposed_structure.json` is now the canonical Step 2 output format.
+No backward compatibility constraints apply for this workspace. Use the status-based schema above.
