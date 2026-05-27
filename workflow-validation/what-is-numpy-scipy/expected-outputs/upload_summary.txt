@@ -1,0 +1,20 @@
+GitHub Upload Summary
+================================================================================
+
+Organization: Atomic-Learning
+Total pages processed: 2
+
+SUCCESSFULLY UPLOADED (2):
+--------------------------------------------------------------------------------
+  [OK] python-numpy-introduction
+       URL: https://github.com/Atomic-Learning/python-numpy-introduction
+  [OK] python-scipy-introduction
+       URL: https://github.com/Atomic-Learning/python-scipy-introduction
+
+SKIPPED - ALREADY EXIST (0):
+--------------------------------------------------------------------------------
+  (None)
+
+FAILED (0):
+--------------------------------------------------------------------------------
+  (None)
