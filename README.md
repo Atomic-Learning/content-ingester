@@ -12,7 +12,12 @@ The process is designed so a human editor can run it end-to-end with clear check
 
 ## Set up environment
 
-It is recommended to open this repository in Visual Studio Code with GitHub Copilot agent or GitHub Codespaces.
+It is recommended to open this repository in Visual Studio Code [locally](#local-setup) on your machine with GitHub Copilot agent or GitHub Codespaces.
+
+### Local setup
+
+Python 3.10 or higher is required. Create and activate a virtual environment, then install dependencies. The agent will attempt
+to perform the local setup automatically if a venv is not detected.
 
 Windows (PowerShell):
 
@@ -30,6 +35,9 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### GitHub API access
+
+A GitHub Personal Access Token (PAT) with repo permissions is required to publish content.
 Create .env from .env.example and set your token:
 
 ```dotenv
