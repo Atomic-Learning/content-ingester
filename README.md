@@ -121,3 +121,9 @@ Review before approval:
 2. Approve generated page files and metadata quality.
 3. Approve final consistency pass and recommendations.
 4. Approve dry-run, then approve real publish.
+
+## Developers
+Focused guidance for developers of the content ingester
+
+### Workflow Validation
+Developers should run this validation process whenever they change workflow or agent behaviour (for example changes to instructions, atomisation guidance, or generation/comparison logic). See [Workflow Validation](workflow-validation/README.md) for details.
