@@ -67,14 +67,14 @@ Required report structure (strict, per template):
 - `# Workflow Validation Report`
 - `## Case: <case-name>`
 - `### File differences (if any)`
-- `### Qualitative differeneces assessment`
+- `### Qualitative difference assessment`
 - `### Noteable divergences`
 
 Rules for structure:
 - Use only the headings above, in the same order.
 - Repeat only the `## Case: <case-name>` block for additional cases.
 - Do not add extra headings such as summary, goals, findings, or final assessment.
-- Put the overall qualitative assessment content inside `### Qualitative differeneces assessment`.
+- Put the overall qualitative assessment content inside `### Qualitative difference assessment`.
 
 Default behavior:
 - Compares each case's `generated-outputs/` to `expected-outputs/`.
@@ -94,7 +94,7 @@ After the report file has the per-case comparison sections and required header:
    - page splitting/combining decisions
    - tagging choices and consistency
    - clarity and usefulness of page content and metadata
-5. Write the assessment strictly under `### Qualitative differeneces assessment` and `### Noteable divergences` for each case.
+5. Write the assessment strictly under `### Qualitative difference assessment` and `### Noteable divergences` for each case.
    - Do not create any additional section headings.
    - Do not include numeric similarity scores or pass/fail labels.
    - Do not ask follow-up questions.
