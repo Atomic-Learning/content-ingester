@@ -1,0 +1,20 @@
+{
+  "name": "content-ingester",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "python -m pip install --upgrade pip && pip install -r requirements.txt",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "GNDEV.md-mermaid-preview-support",
+        "george-alisson.html-preview-vscode"
+      ]
+    }
+  }
+}

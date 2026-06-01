@@ -12,7 +12,15 @@ The process is designed so a human editor can run it end-to-end with clear check
 
 ## Set up environment
 
-It is recommended to open this repository in Visual Studio Code [locally](#local-setup) on your machine with GitHub Copilot agent or GitHub Codespaces.
+It is recommended to open this repository in Visual Studio Code [locally](#local-setup) on your machine with GitHub Copilot agent or [remotely](#github-codespaces-setup) in GitHub Codespaces.
+
+### GitHub Codespaces setup
+
+This repository includes a dev container configuration in `.devcontainer/` for Codespaces.
+
+1. Open the repository on GitHub.
+2. Select **Code** -> **Codespaces** -> **Create codespace on main** (or your working branch).
+3. Wait for container build and `postCreateCommand` to finish.
 
 ### Local setup
 
