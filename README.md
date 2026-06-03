@@ -4,9 +4,9 @@ This repository supports the Atomic Learning content-ingestion workflow:
 
 1. Start from source teaching material in inputs.
 2. Propose atomic pages and their prerequisite structure.
-3. Review the structure of all proposed pages as a whole and finalise.
-4. Create and review page content one page at a time, in dependency order.
-5. Publish each page to GitHub and sync to the learning site, one at a time.
+3. Build page folders with metadata and HTML content.
+4. Validate structure and consistency.
+5. Publish pages as one GitHub repository per page.
 
 The process is designed so a human editor can run it end-to-end with clear checkpoints.
 
@@ -85,25 +85,23 @@ Review before approval:
 4. outputs/dependency_graph.md has no obvious circular dependencies.
 5. Proposed tags align with current tags, with any new tags clearly justified.
 
-### Checkpoint 2: Per-page content creation
+### Checkpoint 2: Page generation
 
-Pages are created one at a time, in dependency order (prerequisites first). For each page, prompt the agent to generate it and review it before moving on, for example:
+Prompt the agent to generate page folders and content, for example:
 
-"Generate the next page from outputs/proposed_structure.json that hasn't been created yet. Create the page folder in outputs/<slug>/ with metadata.json, content.html, license.md, resources/, and resources/.gitkeep. Follow .github/content_file_details.md."
+"Using the approved outputs/proposed_structure.json, generate all page folders in outputs/<slug>/ with metadata.json, content.html, license.md, resources/, and resources/.gitkeep. Follow .github/content_file_details.md."
 
-Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in outputs/. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
+Review before approval:
 
-Review before approving each page:
-
-1. Page folder contains all required files.
+1. Each page folder contains all required files.
 2. metadata.json slug matches folder name.
 3. content.html follows house rules (no h1, UK English, clean HTML).
 4. Prerequisites and related content are plausible and consistent.
-5. Page has a single, focused learning objective.
+5. Spot-check 3 to 5 pages for quality and scope (single learning objective).
 
 ### Checkpoint 3: Consistency and recommendations
 
-Once all pages have been created and individually reviewed, prompt the agent to run a consistency pass and generate recommendations, for example:
+Prompt the agent to run a consistency pass and generate recommendations, for example:
 
 "Run a full consistency pass across outputs/, fix metadata/linking issues, regenerate outputs/dependency_graph.md from metadata, and create outputs/related_content_recommendations.md for existing platform pages."
 
@@ -113,34 +111,21 @@ Review before approval:
 2. No broken or unknown prerequisite slugs remain.
 3. related_content_recommendations.md is specific and actionable.
 
-### Checkpoint 4: Per-page publish
+### Checkpoint 4: Publish
 
-Pages are published one at a time, in the same dependency order used during content creation. For each page, prompt the agent to upload it, register it with the site, and review it before moving on, for example:
+Prompt the agent to run the publish workflow, for example:
 
-"Upload outputs/<slug>/ to GitHub using tools/github_uploader.py, register the new repository with the Atomic Learning site, trigger a sync, and share the live URL for review."
+"Run a dry-run upload with tools/github_uploader.py and show the summary. If approved, run the real upload and report created, skipped, and failed repos plus outputs/upload_summary.txt."
 
-Review before approving each page:
+Review before approval:
 
-1. The correct repository was created on GitHub.
-2. outputs/upload_summary.txt has been updated to reflect all uploads so far.
-3. The page appears correctly on the live site.
-4. Prerequisites and related content resolve to valid pages on the site.
-
-Once all pages have been published, prompt the agent to generate the final upload summary:
-
-"Report all created, skipped, and failed repositories and write outputs/upload_summary.txt."
+1. Dry-run list matches the pages you expect to publish.
+2. Real upload summary has acceptable failures/skips.
+3. Repository URLs in outputs/upload_summary.txt are correct.
 
 ## Minimal Checklist
 
 1. Approve proposed_structure.json and dependency_graph.md.
-2. Approve each page's content individually as it is generated (in dependency order).
+2. Approve generated page files and metadata quality.
 3. Approve final consistency pass and recommendations.
-4. Approve each page's upload and site appearance individually (in dependency order).
-
-## Developers
-
-Focused guidance for developers of the content ingester
-
-### Workflow Validation
-
-Developers should run this validation process whenever they change workflow or agent behaviour (for example changes to instructions, atomisation guidance, or generation/comparison logic). See [Workflow Validation](workflow-validation/README.md) for details.
+4. Approve dry-run, then approve real publish.

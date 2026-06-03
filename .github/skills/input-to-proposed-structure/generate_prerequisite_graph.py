@@ -4,7 +4,15 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+
+def _find_repo_root() -> Path:
+    for candidate in Path(__file__).resolve().parents:
+        if (candidate / "README.md").exists() and (candidate / ".github").exists():
+            return candidate
+    raise RuntimeError("Unable to determine repository root from script location.")
+
+
+ROOT_DIR = _find_repo_root()
 DEFAULT_INPUTS_DIR = ROOT_DIR / "inputs"
 DEFAULT_OUTPUTS_DIR = ROOT_DIR / "outputs"
 DEFAULT_GRAPH_MARKDOWN = DEFAULT_OUTPUTS_DIR / "dependency_graph.md"
