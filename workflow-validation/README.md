@@ -12,6 +12,7 @@ This folder contains regression validation cases for workflow and agent changes.
 ## Case Layout
 
 Each validation case lives in `workflow-validation/<case>/` with:
+
 - `inputs/`
 - `human-inputs/` (optional)
 - `expected-outputs/`
@@ -20,6 +21,7 @@ Each validation case lives in `workflow-validation/<case>/` with:
 ## What To Check In validation-report.md
 
 Review the per-case sections in the single report file and decide whether the reported differences are acceptable in context of your change, with attention to:
+
 - single learning objective per page
 - prerequisite/related-content quality
 - page splitting/combining choices
@@ -29,6 +31,7 @@ Review the per-case sections in the single report file and decide whether the re
 ## Adding A New Validation Example
 
 When adding a new case, create `workflow-validation/<new-case>/` with:
+
 - `inputs/`
 - `human-inputs/` These are supplementary details that were provided during ingestion to generated expected outputs.
 - `expected-outputs/` baseline
