@@ -126,7 +126,7 @@ Finally, you should check the existing pages in `current_content.md` to see if a
 
 ## Step 7. Upload pages to GitHub repositories and sync to the site, one at a time.
 
-Pages are published in the same dependency order used during content creation. Upload each page individually, register it with the Atomic Learning site, trigger a sync, and review the live page before moving on to the next.
+Pages are published in the same dependency order used during content creation. Upload each page individually, then ask the user to coordinate manual registration/sync with the Atomic Learning admin team before moving on to the next.
 
 To upload a page, use the `tools/github_uploader.py` script. This script:
 
@@ -141,6 +141,8 @@ Before uploading, ensure:
 * The organisation name is correct (e.g., `Atomic-Learning`)
 * Your Python virtual environment is activated (created in Step 0)
 
+If the user does not have permission to create repositories in the organisation, they should ask the admin team (contact: Chris Cooling, `c.cooling10@imperial.ac.uk`) to perform the upload or create the repository and grant access.
+
 **Per-page upload workflow:**
 
 For each page (in dependency order):
@@ -154,11 +156,13 @@ python tools/github_uploader.py Atomic-Learning -d outputs/<slug> --dry-run
 python tools/github_uploader.py Atomic-Learning -d outputs/<slug> --force
 ```
 3. Update `outputs/upload_summary.txt` to reflect the current state of all uploads so far. The file should list every page that has been attempted, grouped as: created, skipped, and failed. Replace the file contents each time so it always reflects the full up-to-date picture.
-4. Register the new repository name with the Atomic Learning site and trigger a content sync. Ask the user for the site admin URL or API endpoint if not already known.
+4. Ask the user to register the new repository name with the Atomic Learning site and trigger a content sync manually. Inform them they will need site admin permissions, or they will need to contact Chris Cooling at `c.cooling10@imperial.ac.uk`.
 5. Share the live URL of the new page with the user for review.
 6. Work with the user to fix any issues that appear on the live site (content rendering, broken links, missing resources, etc.).
 7. Once the user approves the page on the site, confirm it is complete and proceed to the next page.
 
 If a repository already exists with the same name, the script will skip it and report it as skipped. To re-upload to an existing repository, you would need to manually handle that or remove the repository from the organisation first.
+
+If GitHub upload steps fail for permission or organisation-policy reasons, tell the user to contact Chris Cooling at `c.cooling10@imperial.ac.uk`.
 
 After all pages have been uploaded, do a final update of `outputs/upload_summary.txt` with the complete results.
