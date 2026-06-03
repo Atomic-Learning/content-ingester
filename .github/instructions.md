@@ -3,6 +3,8 @@ This workspace is designed to support the creation of content for an online lear
 
 This workspace is designed to support the creation of these pages from pre-existing content. The goal is to break down the content into small, digestible pieces that can be easily consumed by learners. The pages are related to each other through noting which are pre-requisites for which other pages.
 
+If the user asks to "run validation tests" (or equivalent regression validation wording), follow `.github/validation-workflow.instructions.md`.
+
 Your goal is to work with the user to process content from the `inputs` directory and create the corresponding "atomic" pages in the `outputs` directory. This will follow a number of steps, which you should guide the user through. At any step, if something is unclear, ask the user. The steps are as follows:
 
 ## 0. Set up the Python environment.
