@@ -40,6 +40,7 @@ python tools/generate_inputs.py tags
 - Fetches `{API_BASE_URL}/content/export` or `{API_BASE_URL}/tags/export` depending on the command
 - Saves the downloaded payload as-is to the `inputs/` directory
 - Creates the `inputs/` directory if it doesn't exist
+- If matching export files already exist (`content-*.md` for content runs, `tags-*.md` for tags runs), prompts you to delete only those matching files before downloading
 
 ## generate_prerequisite_graph.py
 

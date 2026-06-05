@@ -21,6 +21,10 @@ import requests
 from dotenv import load_dotenv
 
 
+class OperationCancelledError(Exception):
+    """Raised when the user cancels an interactive operation."""
+
+
 def load_api_base_url() -> str:
     """
     Load API base URL from .env file.
@@ -43,6 +47,44 @@ def load_api_base_url() -> str:
     return api_url
 
 
+def prepare_inputs_directory(export_type: str) -> Path:
+    """
+    Ensure inputs directory is ready for a new export.
+
+    If matching export files already exist in inputs, ask the user whether to
+    delete only those matching files before continuing.
+
+    Returns:
+        Path: Inputs directory path
+
+    Raises:
+        OperationCancelledError: If user chooses not to delete matching files
+        OSError: If matching files cannot be removed
+    """
+    inputs_dir = Path(__file__).parent.parent / "inputs"
+    inputs_dir.mkdir(parents=True, exist_ok=True)
+
+    existing_entries = [
+        path
+        for path in inputs_dir.glob(f"{export_type}-export-*.md")
+        if path.is_file() or path.is_symlink()
+    ]
+    if not existing_entries:
+        return inputs_dir
+
+    print(f"Detected existing {export_type} export files in {inputs_dir}.")
+    response = input(
+        f"Delete existing {export_type} export files before downloading new export? [y/N]: "
+    ).strip().lower()
+    if response != "y":
+        raise OperationCancelledError("Operation cancelled by user.")
+
+    for entry in existing_entries:
+        entry.unlink()
+
+    return inputs_dir
+
+
 def download_export(endpoint: str, export_type: str) -> None:
     """
     Download content from an export endpoint and save to inputs folder.
@@ -55,11 +97,10 @@ def download_export(endpoint: str, export_type: str) -> None:
         requests.RequestException: If HTTP request fails
         IOError: If file operations fail
     """
+    inputs_dir = prepare_inputs_directory(export_type)
+
     response = requests.get(endpoint, timeout=30)
     response.raise_for_status()
-    
-    inputs_dir = Path(__file__).parent.parent / "inputs"
-    inputs_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     output_path = inputs_dir / f"{export_type}-export-{timestamp}.md"
@@ -116,6 +157,9 @@ def main() -> None:
     except requests.exceptions.RequestException as e:
         print(f"Network error: Failed to download from endpoint - {e}", file=sys.stderr)
         sys.exit(1)
+    except OperationCancelledError as e:
+        print(str(e), file=sys.stderr)
+        sys.exit(0)
     except IOError as e:
         print(f"File error: Failed to save file - {e}", file=sys.stderr)
         sys.exit(1)
