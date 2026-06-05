@@ -5,20 +5,24 @@ description: Validate consistency of generated pages, links, tags, and dependenc
 
 # check-output-consistency
 
-Use this skill after page generation to run consistency checks across `outputs/`.
+Use this skill after page generation to run consistency checks across `<output-dir>/`.
+
+Resolve paths from `.env` before running:
+- `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)
+- `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
 
 ## Tasks
 - Verify `metadata.json` slug matches page directory.
 - Validate prerequisite and related-content references.
-- Check tag consistency against `inputs/tags_current.md`.
+- Check tag consistency against `<input-dir>/tags_current.md`.
 - Ensure each page has `license.md` and `resources/.gitkeep`.
 
 ## Generate final dependency graph from metadata
 
 ```bash
-python .github/skills/input-to-proposed-structure/generate_prerequisite_graph.py --source metadata
+python .github/skills/input-to-proposed-structure/generate_prerequisite_graph.py --source metadata --metadata-root <output-dir> --inputs-dir <input-dir> --output-dir <output-dir>
 ```
 
 ## Produce
-- Updated `outputs/dependency_graph.md`
-- `outputs/related_content_recommendations.md`
+- Updated `<output-dir>/dependency_graph.md`
+- `<output-dir>/related_content_recommendations.md`

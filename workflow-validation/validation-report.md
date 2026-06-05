@@ -19,3 +19,25 @@ The generated result aligns with the expected output at a high level by splittin
 - Less concrete NumPy/SciPy conceptual detail in generated page content.
 - Narrower related-content recommendations than expected.
 - Validation-appropriate upload summary behavior differs from expected production-style artifact.
+
+## Case: what-is-numpy-scipy
+### File differences (if any)
+- Missing generated files compared to expected:
+  - dependency_graph.md
+  - proposed_structure.json
+  - python-numpy-introduction/content.html
+  - python-numpy-introduction/license.md
+  - python-numpy-introduction/metadata.json
+  - python-numpy-introduction/resources/.gitkeep
+  - python-numpy-introduction/resources/numpylogo.png
+  - python-scipy-introduction/content.html
+  - python-scipy-introduction/license.md
+  - python-scipy-introduction/metadata.json
+  - python-scipy-introduction/resources/.gitkeep
+  - python-scipy-introduction/resources/scipy-logo.png
+  - related_content_recommendations.md
+### Qualitative difference assessment
+- Automated comparison completed. Review text diffs and structural differences above.
+- Confirm whether divergences reflect intentional workflow changes or regressions.
+### Noteable divergences
+- Generated output is missing files present in expected outputs.

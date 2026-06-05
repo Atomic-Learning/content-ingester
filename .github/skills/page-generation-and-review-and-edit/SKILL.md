@@ -7,17 +7,21 @@ description: Generate one page at a time in dependency order and iterate with us
 
 Use this skill for checkpoint 2 page generation from approved structure.
 
+Resolve paths from `.env` before running:
+- `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)
+- `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
+
 ## Inputs
-- `outputs/proposed_structure.json`
-- `inputs/current_content.md`
-- `.github/content_file_details.md`
+- `<output-dir>/proposed_structure.json`
+- `<input-dir>/current_content.md`
+- `.github/instructions/content_file_details.md`
 
 ## Required per-page output structure
-- `outputs/<slug>/metadata.json`
-- `outputs/<slug>/content.html`
-- `outputs/<slug>/license.md`
-- `outputs/<slug>/resources/`
-- `outputs/<slug>/resources/.gitkeep`
+- `<output-dir>/<slug>/metadata.json`
+- `<output-dir>/<slug>/content.html`
+- `<output-dir>/<slug>/license.md`
+- `<output-dir>/<slug>/resources/`
+- `<output-dir>/<slug>/resources/.gitkeep`
 
 ## Rules
 - Generate pages strictly in dependency order.

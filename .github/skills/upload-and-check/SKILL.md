@@ -7,20 +7,23 @@ description: Upload generated pages to GitHub one page at a time with dry-run an
 
 Use this skill for checkpoint 4 publication workflow.
 
+Resolve output path from `.env` before running:
+- `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
+
 ## Per-page process
 1. Dry run:
 
 ```bash
-python .github/skills/upload-and-check/github_uploader.py Atomic-Learning -d outputs/<slug> --dry-run
+python .github/skills/upload-and-check/github_uploader.py Atomic-Learning -d <output-dir>/<slug> --dry-run
 ```
 
 2. Upload after confirmation:
 
 ```bash
-python .github/skills/upload-and-check/github_uploader.py Atomic-Learning -d outputs/<slug> --force
+python .github/skills/upload-and-check/github_uploader.py Atomic-Learning -d <output-dir>/<slug> --force
 ```
 
-3. Update `outputs/upload_summary.txt` with cumulative status (created, skipped, failed).
+3. Update `<output-dir>/upload_summary.txt` with cumulative status (created, skipped, failed).
 4. Pause for user live-site review before next page.
 
 ## Guardrails

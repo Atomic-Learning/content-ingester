@@ -46,21 +46,22 @@ pip install -r requirements.txt
 ### GitHub API access
 
 A GitHub Personal Access Token (PAT) with repo permissions is required to publish content.
-Create .env from .env.example and set your token:
-
-```dotenv
-GITHUB_PAT=your_github_pat_here
-```
+Add your token to a `.env` file `GITHUB_PAT=your_github_pat_here`.
 
 ## Workflow
 
-The agent instructions provided in this repository contains the full process of content ingestion and should be able to produce a sensible output from input content without human intervention. Nevertheless, it is recommended to guide the agent following the checkpoints described below to ensure high-quality output.
+The agent instructions provided in this repository contain the full process of content ingestion and should be able to produce sensible output from input content without human intervention. Nevertheless, it is recommended to guide the agent using the checkpoints below to ensure high-quality output.
 
 ### Before you start
 
+The ingestion agent resolves these directories at run start:
+
+- Input directory: `CONTENT_INGESTER_INPUTS_DIR` (default `inputs/`)
+- Output directory: `CONTENT_INGESTER_OUTPUTS_DIR` (default `outputs/`)
+
 Place files in:
 
-- inputs/
+- `CONTENT_INGESTER_INPUTS_DIR` (for example `inputs/`):
   - current_content.md (or similarly named existing content export)
     - Should list existing page slugs with brief descriptions and prerequisite/related links where available.
     - Used by the agent to avoid duplicating already-published content and to validate prerequisite references.
@@ -69,29 +70,29 @@ Place files in:
     - Used by the agent to reuse existing tags and only propose new tags when necessary.
   - new source material in .md or .ipynb format
 
-Outputs will be created in outputs/. Template assets may be downloaded to templates/.
+Outputs will be created in the configured output directory (default `outputs/`). Template assets may be downloaded to `templates/`.
 
 ### Checkpoint 1: Structure proposal
 
 Prompt the agent to create the proposed structure from the input files, for example:
 
-"Read everything in inputs/ and produce outputs/proposed_structure.json using .github/proposed-structure-format.md and .github/atomisation-guidelines.md. Then generate outputs/dependency_graph.md from proposed_structure and summarise key risks."
+"Create <output-dir>/proposed_structure.json from <input-dir>/, then generate <output-dir>/dependency_graph.md and summarise key risks."
 
 Review before approval:
 
-1. outputs/proposed_structure.json has required keys and complete page entries.
+1. `<output-dir>/proposed_structure.json` has required keys and complete page entries.
 2. Page slugs and prerequisites make sense for your curriculum.
 3. status is used correctly (new vs missing prerequisites).
-4. outputs/dependency_graph.md has no obvious circular dependencies.
+4. `<output-dir>/dependency_graph.md` has no obvious circular dependencies.
 5. Proposed tags align with current tags, with any new tags clearly justified.
 
 ### Checkpoint 2: Page generation
 
-Prompt the agent to generate page folders and content, for example:
+Prompt the agent to generate the next page folder and content, for example:
 
-"Using the approved outputs/proposed_structure.json, generate all page folders in outputs/<slug>/ with metadata.json, content.html, license.md, resources/, and resources/.gitkeep. Follow .github/content_file_details.md."
+"Using approved <output-dir>/proposed_structure.json, generate the next page at <output-dir>/<slug>/ with all required files."
 
-Review before approval:
+Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in the configured output directory. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
 
 1. Each page folder contains all required files.
 2. metadata.json slug matches folder name.
@@ -103,7 +104,7 @@ Review before approval:
 
 Prompt the agent to run a consistency pass and generate recommendations, for example:
 
-"Run a full consistency pass across outputs/, fix metadata/linking issues, regenerate outputs/dependency_graph.md from metadata, and create outputs/related_content_recommendations.md for existing platform pages."
+"Run a full consistency pass on <output-dir>/, fix metadata/linking issues, regenerate dependency_graph.md, and create related_content_recommendations.md."
 
 Review before approval:
 
@@ -113,19 +114,32 @@ Review before approval:
 
 ### Checkpoint 4: Publish
 
-Prompt the agent to run the publish workflow, for example:
+Prompt the agent to run the publish workflow for one page at a time, for example:
 
-"Run a dry-run upload with tools/github_uploader.py and show the summary. If approved, run the real upload and report created, skipped, and failed repos plus outputs/upload_summary.txt."
+"Run Stage 5 (upload-and-check) for <output-dir>/<slug>."
 
-Review before approval:
+Review before approving each page:
 
-1. Dry-run list matches the pages you expect to publish.
-2. Real upload summary has acceptable failures/skips.
-3. Repository URLs in outputs/upload_summary.txt are correct.
+1. The correct repository was created on GitHub.
+2. `<output-dir>/upload_summary.txt` has been updated to reflect all uploads so far.
+3. The page appears correctly on the live site.
+4. Prerequisites and related content resolve to valid pages on the site.
+
+Once all pages have been published, prompt the agent to generate the final upload summary:
+
+"Write <output-dir>/upload_summary.txt with created, skipped, and failed repositories."
+
+### Validation workflow prompt
+
+Use the Workflow Validation Assistant for regression checks.
+
+Prompt:
+
+"Run validate-workflow for all cases in workflow-validation/."
 
 ## Minimal Checklist
 
 1. Approve proposed_structure.json and dependency_graph.md.
 2. Approve generated page files and metadata quality.
 3. Approve final consistency pass and recommendations.
-4. Approve dry-run, then approve real publish.
+4. Approve publish results and final upload summary.
