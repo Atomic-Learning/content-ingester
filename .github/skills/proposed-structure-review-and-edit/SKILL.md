@@ -5,7 +5,8 @@ description: Review and revise proposed_structure.json with dependency-aware edi
 
 # proposed-structure-review-and-edit
 
-Use this skill after initial structure generation to refine `<output-dir>/proposed_structure.json`.
+Use this skill after initial structure generation to refine `<output-dir>/proposed_structure.json`
+until the user confirms the structure is good and is ready to move to the next stage.
 
 Resolve paths from `.env` before running:
 - `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)

@@ -12,9 +12,9 @@ Resolve paths from `.env` before running:
 - `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
 
 ## Read
-- `<input-dir>/current_content.md` (or nearest variant)
-- `<input-dir>/tags_current.md` (or nearest variant)
-- New source files in `<input-dir>/`
+- `<input-dir>/current_content.md`
+- `<input-dir>/tags_current.md`
+- New content files in `<input-dir>/`
 - `.github/instructions/atomisation-guidelines.md`
 - `.github/instructions/proposed-structure-format.md`
 

@@ -4,7 +4,7 @@ Use this file as the top-level routing policy for this workspace.
 
 ## Primary Routing Rule
 
-- For normal Atomic Learning ingestion work using configured ingestion folders (defaults: `inputs/` and `outputs/`), use the `Content Ingestion Assistant`.
+- For normal Atomic Learning ingestion work use the `Content Ingestion Assistant`.
 - For regression validation work, validation reports, or any request that explicitly mentions `workflow-validation/`, use the `validate-workflow` skill.
 
 ## Route To Content Ingestion Assistant
