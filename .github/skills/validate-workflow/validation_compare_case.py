@@ -63,6 +63,7 @@ def compare_case(case_name: str) -> Tuple[str, str]:
 
     changed_text: List[str] = []
     changed_binary: List[str] = []
+    text_diffs: dict[str, str] = {}
 
     for rel in shared:
         expected_path = expected / rel
@@ -71,11 +72,17 @@ def compare_case(case_name: str) -> Tuple[str, str]:
             a = _read_text(expected_path)
             b = _read_text(generated_path)
             if a != b:
+                changed_text.append(rel)
                 diff_lines = list(
-                    difflib.unified_diff(a, b, fromfile=f"expected/{rel}", tofile=f"generated/{rel}", n=1)
+                    difflib.unified_diff(
+                        a,
+                        b,
+                        fromfile=f"expected/{rel}",
+                        tofile=f"generated/{rel}",
+                        lineterm="",
+                    )
                 )
-                preview = "\n".join(diff_lines[:20])
-                changed_text.append(f"- {rel}\n\n```diff\n{preview}\n```")
+                text_diffs[rel] = "\n".join(diff_lines)
         else:
             if expected_path.read_bytes() != generated_path.read_bytes():
                 changed_binary.append(rel)
@@ -92,33 +99,31 @@ def compare_case(case_name: str) -> Tuple[str, str]:
         file_diff_lines.extend([f"  - {item}" for item in changed_binary])
     if changed_text:
         file_diff_lines.append("- Text files differ:")
-        file_diff_lines.extend(changed_text)
+        file_diff_lines.extend([f"  - {item}" for item in changed_text])
     if not file_diff_lines:
         file_diff_lines.append("- No file differences detected.")
 
-    qualitative = [
-        "- Automated comparison completed. Review text diffs and structural differences above.",
-        "- Confirm whether divergences reflect intentional workflow changes or regressions.",
-    ]
-
-    notable = []
+    # Print diffs to stdout for the LLM to read and analyse
+    if text_diffs:
+        print(f"\n=== Text diffs for case: {case_name} ===\n")
+        for rel, diff in text_diffs.items():
+            print(f"--- {rel} ---")
+            print(diff)
+            print()
     if missing:
-        notable.append("- Generated output is missing files present in expected outputs.")
+        print(f"Missing files: {missing}")
     if extra:
-        notable.append("- Generated output contains additional files not present in expected outputs.")
-    if changed_text or changed_binary:
-        notable.append("- One or more shared files differ in content.")
-    if not notable:
-        notable.append("- No notable divergences found by automated file comparison.")
+        print(f"Extra files: {extra}")
+    if changed_binary:
+        print(f"Binary files changed: {changed_binary}")
 
     block = [
         f"## Case: {case_name}",
         "### File differences (if any)",
         *file_diff_lines,
         "### Qualitative difference assessment",
-        *qualitative,
-        "### Noteable divergences",
-        *notable,
+        "",
+        "### Notable divergences",
         "",
     ]
 
@@ -150,7 +155,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--append",
         action="store_true",
-        help="Append case section to report. If report does not exist, initialize first.",
+        help="Append case section to report. Default behavior overwrites the report with a fresh header and case section.",
     )
     return parser.parse_args()
 
@@ -169,7 +174,9 @@ def main() -> None:
         print(f"Appended report section for case: {args.case}")
         print(f"Report file: {args.report}")
     else:
-        print(block)
+        args.report.write_text(init_report_text() + block + "\n", encoding="utf-8")
+        print(f"Wrote report section for case: {args.case}")
+        print(f"Report file: {args.report}")
 
 
 if __name__ == "__main__":

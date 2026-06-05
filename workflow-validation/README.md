@@ -15,7 +15,7 @@ Recommended command flow per case:
 ```bash
 python .github/skills/validate-workflow/validation_clean_case_outputs.py --case <case-name>
 # Run generation against workflow-validation/<case-name>/inputs -> workflow-validation/<case-name>/generated-outputs
-python .github/skills/validate-workflow/validation_compare_case.py --case <case-name> --report workflow-validation/validation-report.md --append
+python .github/skills/validate-workflow/validation_compare_case.py --case <case-name> --report workflow-validation/validation-report.md
 ```
 
 ## Case Layout
