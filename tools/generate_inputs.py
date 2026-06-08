@@ -42,31 +42,34 @@ def load_api_base_url() -> str:
     return api_url
 
 
-def prepare_inputs_directory(export_type: str) -> Path:
+def prepare_inputs_directory(inputs_dir: Path) -> Path:
     """
     Ensure inputs directory exists.
+
+    Args:
+        inputs_dir: Path to the inputs directory
 
     Returns:
         Path: Inputs directory path
     """
-    inputs_dir = Path(__file__).parent.parent / "inputs"
     inputs_dir.mkdir(parents=True, exist_ok=True)
     return inputs_dir
 
 
-def download_export(endpoint: str, export_type: str) -> None:
+def download_export(endpoint: str, export_type: str, download_dir: Path) -> None:
     """
     Download content from an export endpoint and save to inputs folder.
     
     Args:
         endpoint: Full URL endpoint to download from
         export_type: Type of export (content or tags)
+        download_dir: Path to the inputs directory
         
     Raises:
         requests.RequestException: If HTTP request fails
         IOError: If file operations fail
     """
-    inputs_dir = prepare_inputs_directory(export_type)
+    inputs_dir = prepare_inputs_directory(download_dir)
 
     response = requests.get(endpoint, timeout=30)
     response.raise_for_status()
@@ -96,6 +99,14 @@ def parse_arguments() -> argparse.Namespace:
         help="Type of export to download (content or tags)",
     )
     
+    parser.add_argument(
+        "-d",
+        "--download-dir",
+        type=Path,
+        default=Path(__file__).parent.parent / "inputs",
+        help="Directory to save inputs (default: ./inputs)",
+    )
+    
     return parser.parse_args()
 
 
@@ -117,7 +128,7 @@ def main() -> None:
         endpoint = f"{api_base_url}/{args.export_type}/export"
         
         # Download and save
-        download_export(endpoint, args.export_type)
+        download_export(endpoint, args.export_type, args.download_dir)
         
     except ValueError as e:
         print(f"Configuration error: {e}", file=sys.stderr)
