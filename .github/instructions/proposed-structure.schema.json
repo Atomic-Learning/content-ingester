@@ -1,0 +1,111 @@
+{
+  "title": "Proposed Structure",
+  "description": "Schema for outputs/proposed_structure.json. See proposed-structure-format.md for the prose specification.",
+  "type": "object",
+  "required": [
+    "inputs_reviewed",
+    "user_preferences_applied",
+    "pages",
+    "omitted_source_sections",
+    "tag_review",
+    "checkpoint_review"
+  ],
+  "properties": {
+    "inputs_reviewed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "role"],
+        "properties": {
+          "path": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      }
+    },
+    "user_preferences_applied": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "pages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "slug",
+          "title",
+          "learning_objective",
+          "description",
+          "prerequisites",
+          "related_content",
+          "proposed_tags",
+          "status"
+        ],
+        "properties": {
+          "slug": { "type": "string" },
+          "title": { "type": "string" },
+          "learning_objective": { "type": "string" },
+          "description": { "type": "string" },
+          "prerequisites": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "related_content": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "proposed_tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "status": {
+            "type": "string",
+            "enum": ["new", "missing"]
+          }
+        }
+      }
+    },
+    "omitted_source_sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "reason"],
+        "properties": {
+          "section": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "tag_review": {
+      "type": "object",
+      "required": ["new_tags_required", "existing_tags_used", "notes"],
+      "properties": {
+        "new_tags_required": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "existing_tags_used": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "checkpoint_review": {
+      "type": "object",
+      "required": [
+        "language_agnostic_foundations_first",
+        "single_learning_objective",
+        "concrete_exercises",
+        "exercise_naming_conventions",
+        "tagging_conventions"
+      ],
+      "properties": {
+        "language_agnostic_foundations_first": { "type": "string" },
+        "single_learning_objective": { "type": "string" },
+        "concrete_exercises": { "type": "string" },
+        "exercise_naming_conventions": { "type": "string" },
+        "tagging_conventions": { "type": "string" }
+      }
+    }
+  }
+}
