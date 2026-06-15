@@ -2,8 +2,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import List
-
 from jsonschema import Draft202012Validator
 
 # Schema lives at .github/instructions/ — two directories up from this skill folder.
@@ -16,13 +14,6 @@ def load_json(path: Path) -> object:
     with path.open("r", encoding="utf-8-sig") as handle:
         return json.load(handle)
 
-
-def format_path(absolute_path) -> str:
-    """Render a jsonschema error path as a JSON-pointer-like location."""
-    if not absolute_path:
-        return "<root>"
-    parts: List[str] = [str(part) for part in absolute_path]
-    return "/".join(parts)
 
 
 def parse_args() -> argparse.Namespace:
@@ -72,7 +63,7 @@ def main() -> int:
 
     print(f"✗ {len(errors)} schema error(s) in {args.proposed_file}:")
     for error in errors:
-        print(f"  - {format_path(error.absolute_path)}: {error.message}")
+        print(f"  - {'/'.join(str(p) for p in error.absolute_path) or '<root>'}: {error.message}")
     return 1
 
 
