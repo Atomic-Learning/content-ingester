@@ -1,6 +1,6 @@
 {
   "title": "Proposed Structure",
-  "description": "Schema for outputs/proposed_structure.json. See proposed-structure-format.md for the prose specification.",
+  "description": "Schema for outputs/proposed_structure.json. Use updating-proposed-structure.md for workflow steps and proposed-structure.example.json for a concrete example.",
   "type": "object",
   "required": [
     "inputs_reviewed",
@@ -12,21 +12,33 @@
   ],
   "properties": {
     "inputs_reviewed": {
+      "description": "Input files used to build this proposal, including their role in the decision process.",
       "type": "array",
       "items": {
         "type": "object",
         "required": ["path", "role"],
         "properties": {
-          "path": { "type": "string" },
-          "role": { "type": "string" }
+          "path": {
+            "type": "string",
+            "description": "Workspace-relative path to the input file that was reviewed."
+          },
+          "role": {
+            "type": "string",
+            "description": "Short explanation of how this input informed the proposal."
+          }
         }
       }
     },
     "user_preferences_applied": {
+      "description": "Explicit user preferences or constraints applied while creating this proposal.",
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string",
+        "description": "One preference or instruction applied to the proposal."
+      }
     },
     "pages": {
+      "description": "Proposed pages, including both new pages and missing prerequisite pages.",
       "type": "array",
       "items": {
         "type": "object",
@@ -41,56 +53,101 @@
           "status"
         ],
         "properties": {
-          "slug": { "type": "string" },
-          "title": { "type": "string" },
-          "learning_objective": { "type": "string" },
-          "description": { "type": "string" },
+          "slug": {
+            "type": "string",
+            "description": "Unique slug for this page, used by metadata and dependency graph tooling."
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable page title shown to users."
+          },
+          "learning_objective": {
+            "type": "string",
+            "description": "Single primary learning objective for the page."
+          },
+          "description": {
+            "type": "string",
+            "description": "Brief summary of page scope and learner outcome."
+          },
           "prerequisites": {
+            "description": "Ordered list of prerequisite page slugs needed before this page.",
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string",
+              "description": "Slug of a required prerequisite page."
+            }
           },
           "related_content": {
+            "description": "Suggested related page slugs for onward learning.",
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string",
+              "description": "Slug of related page content."
+            }
           },
           "proposed_tags": {
+            "description": "Tag names to apply to the page in later publishing steps.",
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string",
+              "description": "Single tag name to apply to this page."
+            }
           },
           "status": {
             "type": "string",
+            "description": "Page classification: `new` for deliverable pages, `missing` for proposed prerequisite gaps.",
             "enum": ["new", "missing"]
           }
         }
       }
     },
     "omitted_source_sections": {
+      "description": "Source sections intentionally not mapped to a proposed page.",
       "type": "array",
       "items": {
         "type": "object",
         "required": ["section", "reason"],
         "properties": {
-          "section": { "type": "string" },
-          "reason": { "type": "string" }
+          "section": {
+            "type": "string",
+            "description": "Name or identifier of the omitted source section."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the section was omitted from this proposal."
+          }
         }
       }
     },
     "tag_review": {
+      "description": "Summary of how proposed tags align to existing taxonomy.",
       "type": "object",
       "required": ["new_tags_required", "existing_tags_used", "notes"],
       "properties": {
         "new_tags_required": {
+          "description": "Tags needed for this proposal that are not present in current tags export.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string",
+            "description": "Tag name that would need to be created."
+          }
         },
         "existing_tags_used": {
+          "description": "Tags from the existing taxonomy that are used by proposed pages.",
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string",
+            "description": "Tag name already available in the platform taxonomy."
+          }
         },
-        "notes": { "type": "string" }
+        "notes": {
+          "type": "string",
+          "description": "Additional rationale or caveats for tag decisions."
+        }
       }
     },
     "checkpoint_review": {
+      "description": "Checklist narrative confirming alignment with content-ingestion quality checkpoints.",
       "type": "object",
       "required": [
         "language_agnostic_foundations_first",
@@ -100,11 +157,26 @@
         "tagging_conventions"
       ],
       "properties": {
-        "language_agnostic_foundations_first": { "type": "string" },
-        "single_learning_objective": { "type": "string" },
-        "concrete_exercises": { "type": "string" },
-        "exercise_naming_conventions": { "type": "string" },
-        "tagging_conventions": { "type": "string" }
+        "language_agnostic_foundations_first": {
+          "type": "string",
+          "description": "How foundational, language-agnostic concepts were placed before tool-specific content."
+        },
+        "single_learning_objective": {
+          "type": "string",
+          "description": "How each page was kept to one primary learning objective."
+        },
+        "concrete_exercises": {
+          "type": "string",
+          "description": "How practical, concrete exercises were ensured in proposed content."
+        },
+        "exercise_naming_conventions": {
+          "type": "string",
+          "description": "How exercise and page naming conventions were applied."
+        },
+        "tagging_conventions": {
+          "type": "string",
+          "description": "How tagging conventions were followed in proposed tags."
+        }
       }
     }
   }
