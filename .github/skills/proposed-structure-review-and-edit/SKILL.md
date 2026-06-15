@@ -12,11 +12,19 @@ Resolve paths from `.env` before running:
 - `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)
 - `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
 
+Reference `.github/instructions/updating-proposed-structure.md` for the required edit workflow.
+
 ## Tasks
 - Validate required fields for each page.
 - Refine prerequisite ordering and avoid cycles.
 - Improve split decisions to keep one learning objective per page.
 - Reconcile tags against `<input-dir>/tags_current.md`.
+
+## Validate after edits
+
+```bash
+python .github/skills/input-to-proposed-structure/validate_proposed_structure.py --proposed-file <output-dir>/proposed_structure.json
+```
 
 ## Regenerate graph after edits
 
