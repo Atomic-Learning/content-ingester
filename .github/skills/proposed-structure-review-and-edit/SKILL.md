@@ -22,12 +22,6 @@ Reference `.github/instructions/updating-proposed-structure.md` for the required
 - Improve split decisions to keep one learning objective per page.
 - Reconcile tags against `<input-dir>/tags_current.md`.
 
-## Validate after edits
-
-```bash
-python .github/skills/input-to-proposed-structure/validate_proposed_structure.py --proposed-file <output-dir>/proposed_structure.json
-```
-
 ## Regenerate graph after edits
 
 ```bash

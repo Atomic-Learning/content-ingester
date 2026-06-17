@@ -20,12 +20,6 @@ Resolve paths from `.env` before running:
 - `.github/instructions/atomisation-guidelines.md`
 - `.github/instructions/updating-proposed-structure.md`
 
-## Validate proposed structure
-
-```bash
-python .github/skills/input-to-proposed-structure/validate_proposed_structure.py --proposed-file <output-dir>/proposed_structure.json
-```
-
 ## Produce
 
 - `<output-dir>/proposed_structure.json`
