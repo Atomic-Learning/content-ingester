@@ -19,5 +19,5 @@ applyTo: "**"
 - Keep generated ingestion artifacts in the active output directory for the run.
 - Reuse existing support docs as references when needed:
   - `.github/instructions/atomisation-guidelines.md`
-  - `.github/instructions/proposed-structure-format.md`
+  - `.github/instructions/updating-proposed-structure.md`
   - `.github/instructions/content_file_details.md`
