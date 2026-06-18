@@ -76,7 +76,7 @@ Outputs will be created in the configured output directory (default `outputs/`).
 
 Prompt the agent to create the proposed structure from the input files, for example:
 
-"Create <output-dir>/proposed_structure.json from <input-dir>/, then generate <output-dir>/dependency_graph.md and summarise key risks."
+`Create <output-dir>/proposed_structure.json from <input-dir>/, then generate <output-dir>/dependency_graph.md and summarise key risks.`
 
 Review before approval:
 
@@ -90,7 +90,7 @@ Review before approval:
 
 Prompt the agent to generate the next page folder and content, for example:
 
-"Using approved <output-dir>/proposed_structure.json, generate the next page at <output-dir>/<slug>/ with all required files."
+`Using approved <output-dir>/proposed_structure.json, generate the next page at <output-dir>/<slug>/ with all required files.`
 
 Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in the configured output directory. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
 
@@ -104,19 +104,19 @@ Repeat this for each page. The agent will determine the next page based on which
 
 Prompt the agent to run a consistency pass and generate recommendations, for example:
 
-"Run a full consistency pass on <output-dir>/, fix metadata/linking issues, regenerate dependency_graph.md, and create related_content_recommendations.md."
+`Run a full consistency pass on <output-dir>/, fix metadata/linking issues, regenerate dependency_graph.md, and create related_content_recommendations.md.`
 
 Review before approval:
 
 1. Final graph still has no circular dependencies.
 2. No broken or unknown prerequisite slugs remain.
-3. related_content_recommendations.md is specific and actionable.
+3. `related_content_recommendations.md` is specific and actionable.
 
 ### Checkpoint 4: Publish
 
 Prompt the agent to run the publish workflow for one page at a time, for example:
 
-"Run Stage 5 (upload-and-check) for <output-dir>/<slug>."
+`Run Stage 5 (upload-and-check) for <output-dir>/<slug>/.`
 
 Review before approving each page:
 
@@ -127,7 +127,7 @@ Review before approving each page:
 
 Once all pages have been published, prompt the agent to generate the final upload summary:
 
-"Write <output-dir>/upload_summary.txt with created, skipped, and failed repositories."
+`Write <output-dir>/upload_summary.txt with created, skipped, and failed repositories.`
 
 ### Validation workflow prompt
 
@@ -135,7 +135,7 @@ Use the Workflow Validation Assistant for regression checks.
 
 Prompt:
 
-"Run validate-workflow for all cases in workflow-validation/."
+`Run validate-workflow for all cases in workflow-validation/.`
 
 ## Minimal Checklist
 
