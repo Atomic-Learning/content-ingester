@@ -1,12 +1,34 @@
 import argparse
 import json
 import re
+import os
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_INPUTS_DIR = ROOT_DIR / "inputs"
-DEFAULT_OUTPUTS_DIR = ROOT_DIR / "outputs"
+from dotenv import load_dotenv
+
+
+def _find_repo_root() -> Path:
+    for candidate in Path(__file__).resolve().parents:
+        if (candidate / "README.md").exists() and (candidate / ".github").exists():
+            return candidate
+    raise RuntimeError("Unable to determine repository root from script location.")
+
+
+ROOT_DIR = _find_repo_root()
+load_dotenv(ROOT_DIR / ".env")
+
+
+def _resolve_dir_from_env(var_name: str, fallback: str) -> Path:
+    value = os.getenv(var_name, fallback).strip()
+    path = Path(value)
+    if not path.is_absolute():
+        path = ROOT_DIR / path
+    return path
+
+
+DEFAULT_INPUTS_DIR = _resolve_dir_from_env("CONTENT_INGESTER_INPUTS_DIR", "inputs")
+DEFAULT_OUTPUTS_DIR = _resolve_dir_from_env("CONTENT_INGESTER_OUTPUTS_DIR", "outputs")
 DEFAULT_GRAPH_MARKDOWN = DEFAULT_OUTPUTS_DIR / "dependency_graph.md"
 
 
@@ -240,13 +262,19 @@ def parse_args() -> argparse.Namespace:
         "--proposed-file",
         type=Path,
         default=DEFAULT_OUTPUTS_DIR / "proposed_structure.json",
-        help="Path to proposed_structure JSON file.",
+        help=(
+            "Path to proposed_structure JSON file. Defaults to "
+            "$CONTENT_INGESTER_OUTPUTS_DIR/proposed_structure.json (or outputs/proposed_structure.json)."
+        ),
     )
     parser.add_argument(
         "--metadata-root",
         type=Path,
         default=DEFAULT_OUTPUTS_DIR,
-        help="Root directory containing page folders with metadata.json files.",
+        help=(
+            "Root directory containing page folders with metadata.json files. Defaults to "
+            "$CONTENT_INGESTER_OUTPUTS_DIR (or outputs/)."
+        ),
     )
     parser.add_argument(
         "--existing-content-file",
@@ -258,13 +286,19 @@ def parse_args() -> argparse.Namespace:
         "--inputs-dir",
         type=Path,
         default=DEFAULT_INPUTS_DIR,
-        help="Inputs directory used to auto-detect existing content file.",
+        help=(
+            "Inputs directory used to auto-detect existing content file. Defaults to "
+            "$CONTENT_INGESTER_INPUTS_DIR (or inputs/)."
+        ),
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
         default=DEFAULT_OUTPUTS_DIR,
-        help="Directory where dependency_graph.md will be written.",
+        help=(
+            "Directory where dependency_graph.md will be written. Defaults to "
+            "$CONTENT_INGESTER_OUTPUTS_DIR (or outputs/)."
+        ),
     )
     parser.add_argument(
         "--direction",
@@ -278,6 +312,17 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    # Treat relative CLI paths as repository-relative for consistency with env defaults.
+    if not args.proposed_file.is_absolute():
+        args.proposed_file = ROOT_DIR / args.proposed_file
+    if not args.metadata_root.is_absolute():
+        args.metadata_root = ROOT_DIR / args.metadata_root
+    if args.existing_content_file is not None and not args.existing_content_file.is_absolute():
+        args.existing_content_file = ROOT_DIR / args.existing_content_file
+    if not args.inputs_dir.is_absolute():
+        args.inputs_dir = ROOT_DIR / args.inputs_dir
+    if not args.output_dir.is_absolute():
+        args.output_dir = ROOT_DIR / args.output_dir
 
     if args.source == "proposed_structure":
         if not args.proposed_file.exists():

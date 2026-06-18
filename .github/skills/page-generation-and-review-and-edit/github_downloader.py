@@ -16,6 +16,13 @@ from git import Repo
 from dotenv import load_dotenv
 
 
+def _find_repo_root() -> Path:
+    for candidate in Path(__file__).resolve().parents:
+        if (candidate / "README.md").exists() and (candidate / ".github").exists():
+            return candidate
+    raise RuntimeError("Unable to determine repository root from script location.")
+
+
 def load_github_token():
     """
     Load GitHub PAT from .env file.
@@ -27,7 +34,7 @@ def load_github_token():
         ValueError: If GITHUB_PAT is not found in .env file
     """
     # Load environment variables from .env file in project root
-    env_path = Path(__file__).parent.parent / ".env"
+    env_path = _find_repo_root() / ".env"
     load_dotenv(env_path)
     
     token = os.getenv("GITHUB_PAT")
