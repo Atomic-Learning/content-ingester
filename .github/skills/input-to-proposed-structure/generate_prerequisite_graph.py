@@ -41,8 +41,12 @@ def detect_existing_content_file(inputs_dir: Path) -> Optional[Path]:
         "*content*export*.md",
     ]
 
+    search_dir = inputs_dir / "live-website-export"
+    if not search_dir.is_dir():
+        search_dir = inputs_dir
+
     for pattern in patterns:
-        candidates.extend(inputs_dir.glob(pattern))
+        candidates.extend(search_dir.glob(pattern))
 
     unique_files = sorted(set(candidates), key=lambda p: p.name.lower())
     if not unique_files:

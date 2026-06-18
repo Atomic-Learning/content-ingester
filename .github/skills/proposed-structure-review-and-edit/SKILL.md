@@ -20,7 +20,7 @@ Reference `.github/instructions/updating-proposed-structure.md` for the required
 - Validate required fields for each page.
 - Refine prerequisite ordering and avoid cycles.
 - Improve split decisions to keep one learning objective per page.
-- Reconcile tags against `<input-dir>/tags_current.md`.
+- Reconcile tags against `<input-dir>/live-website-export/tags_current.md`.
 
 ## Regenerate graph after edits
 

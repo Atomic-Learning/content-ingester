@@ -41,5 +41,5 @@ This creates a clearer navigation bridge between built-in modules (standard libr
 
 ## Notes
 
-- Recommendations are limited to existing pages in inputs/content-export-20260526-143934.md.
+- Recommendations are limited to existing pages in inputs/live-website-export/content-export-20260526-143934.md.
 - No prerequisite changes are proposed here, only related-content discoverability improvements.

@@ -14,7 +14,7 @@ Resolve paths from `.env` before running:
 ## Tasks
 - Verify `metadata.json` slug matches page directory.
 - Validate prerequisite and related-content references.
-- Check tag consistency against `<input-dir>/tags_current.md`.
+- Check tag consistency against `<input-dir>/live-website-export/tags_current.md`.
 - Ensure each page has `license.md` and `resources/.gitkeep`.
 
 ## Generate final dependency graph from metadata
