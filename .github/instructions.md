@@ -47,6 +47,8 @@ Other files in the `inputs` directory will contain content that is not yet in th
 
 * Markdown file: You can read this with no special steps.
 * Jupyter notebook: You can read this with no special steps.
+* PDF files: Check the specific instructions in `.github/PDF-IMAGE-EXTRACTION.md` to ensure images are extracted properly
+
 If an unsupported file format is present, ask the user.
 
 You should read through this content and propose a structure for how it could be broken down into atomic pages. Detailed guidelines are presented in the file `.github/atomisation-guidelines.md`. The required Step 2 output format is defined in `.github/proposed-structure-format.md`.
