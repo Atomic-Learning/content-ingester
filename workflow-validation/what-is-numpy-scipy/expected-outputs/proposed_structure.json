@@ -1,15 +1,15 @@
 {
   "inputs_reviewed": [
     {
-      "path": "inputs/content-export-20260526-143934.md",
+      "path": "inputs/live-website-export/content-export-20260526-143934.md",
       "role": "existing platform content"
     },
     {
-      "path": "inputs/tags_current.md",
+      "path": "inputs/live-website-export/tags_current.md",
       "role": "existing tag list"
     },
     {
-      "path": "inputs/What are NumPy and SciPy.ipynb",
+      "path": "inputs/content-to-ingest/What are NumPy and SciPy.ipynb",
       "role": "new source content to atomise"
     }
   ],

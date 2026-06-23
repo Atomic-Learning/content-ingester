@@ -14,9 +14,9 @@ Resolve paths from `.env` before running:
 
 ## Read
 
-- `<input-dir>/current_content.md`
-- `<input-dir>/tags_current.md`
-- New content files in `<input-dir>/`
+- `<input-dir>/live-website-export/current_content.md`
+- `<input-dir>/live-website-export/tags_current.md`
+- New content files in `<input-dir>/content-to-ingest/`
 - `.github/instructions/atomisation-guidelines.md`
 - `.github/instructions/updating-proposed-structure.md`
 

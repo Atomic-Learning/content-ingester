@@ -62,13 +62,15 @@ The ingestion agent resolves these directories at run start:
 Place files in:
 
 - `CONTENT_INGESTER_INPUTS_DIR` (for example `inputs/`):
-  - current_content.md (or similarly named existing content export)
-    - Should list existing page slugs with brief descriptions and prerequisite/related links where available.
-    - Used by the agent to avoid duplicating already-published content and to validate prerequisite references.
-  - tags_current.md (or similar tags export)
-    - Should list the current platform tag names (one per line or simple grouped lists).
-    - Used by the agent to reuse existing tags and only propose new tags when necessary.
-  - new source material in .md or .ipynb format
+  - `live-website-export/` subfolder:
+    - current_content.md (or similarly named existing content export)
+      - Should list existing page slugs with brief descriptions and prerequisite/related links where available.
+      - Used by the agent to avoid duplicating already-published content and to validate prerequisite references.
+    - tags_current.md (or similar tags export)
+      - Should list the current platform tag names (one per line or simple grouped lists).
+      - Used by the agent to reuse existing tags and only propose new tags when necessary.
+  - `content-to-ingest/` subfolder:
+    - new source material in .md or .ipynb format
 
 Outputs will be created in the configured output directory (default `outputs/`). Template assets may be downloaded to `templates/`.
 
