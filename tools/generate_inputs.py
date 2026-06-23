@@ -3,18 +3,19 @@ Content and Tags Export Downloader
 
 Downloads content and tags from live atomic learning website
 
-The API base URL should be stored in a .env file in the project root:
+The API base URL and API key should be stored in a .env file in the project root:
     API_BASE_URL=https://your-api-url
+    API_KEY=your-api-key
 
 Usage:
-    python generate_inputs.py content    # Download from {API_BASE_URL}/content/export
-    python generate_inputs.py tags       # Download from {API_BASE_URL}/tags/export
+    python generate_inputs.py "search query"
 """
 
 import os
 import sys
 import argparse
 from pathlib import Path
+from urllib.parse import quote
 
 import requests
 from dotenv import load_dotenv
@@ -42,6 +43,24 @@ def load_api_base_url() -> str:
     return api_url
 
 
+def load_api_key() -> str:
+    """
+    Load API key from .env file.
+    
+    Returns:
+        str: API key
+        
+    Raises:
+        ValueError: If API_KEY is not found in .env file
+    """
+    api_key = os.getenv("API_KEY")
+    if not api_key:
+        raise ValueError(
+            "API_KEY not found in .env file. "
+            "Please add: API_KEY=your-api-key"
+        )
+    return api_key
+
 def prepare_inputs_directory(inputs_dir: Path) -> Path:
     """
     Ensure inputs directory exists.
@@ -56,7 +75,7 @@ def prepare_inputs_directory(inputs_dir: Path) -> Path:
     return inputs_dir
 
 
-def download_export(endpoint: str, export_type: str, download_dir: Path) -> None:
+def download_export(endpoint: str, export_type: str, download_dir: Path, api_key: str) -> None:
     """
     Download content from an export endpoint and save to inputs folder.
     
@@ -64,6 +83,7 @@ def download_export(endpoint: str, export_type: str, download_dir: Path) -> None
         endpoint: Full URL endpoint to download from
         export_type: Type of export (content or tags)
         download_dir: Path to the inputs directory
+        api_key: API key for authentication
         
     Raises:
         requests.RequestException: If HTTP request fails
@@ -71,7 +91,8 @@ def download_export(endpoint: str, export_type: str, download_dir: Path) -> None
     """
     inputs_dir = prepare_inputs_directory(download_dir)
 
-    response = requests.get(endpoint, timeout=30)
+    headers = {"X-API-Key": api_key}
+    response = requests.get(endpoint, headers=headers, timeout=30)
     response.raise_for_status()
 
     output_path = inputs_dir / f"current-{export_type}-export.md"
@@ -86,17 +107,16 @@ def parse_arguments() -> argparse.Namespace:
         argparse.Namespace: Parsed arguments
     """
     parser = argparse.ArgumentParser(
-        description="Download content and tags from export endpoints",
+         description="Download content and tags from query-based endpoints",
         epilog="Examples:\n"
-               "  python generate_inputs.py content\n"
-               "  python generate_inputs.py tags",
+             "  python generate_inputs.py \"numpy\"\n"
+             "  python generate_inputs.py \"data science\"",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     
     parser.add_argument(
-        "export_type",
-        choices=["content", "tags"],
-        help="Type of export to download (content or tags)",
+        "query",
+        help="Search query used to download both content and tags",
     )
     
     parser.add_argument(
@@ -118,17 +138,21 @@ def main() -> None:
         # Parse arguments
         args = parse_arguments()
         
-        # Load API base URL
+        # Load API base URL and key
         api_base_url = load_api_base_url()
+        api_key = load_api_key()
         
         # Ensure URL doesn't have trailing slash for consistency
         api_base_url = api_base_url.rstrip("/")
+        normalized_query = " ".join(args.query.split())
+        query = quote(normalized_query, safe="")
         
-        # Build endpoint URL
-        endpoint = f"{api_base_url}/{args.export_type}/export"
-        
-        # Download and save
-        download_export(endpoint, args.export_type, args.download_dir)
+        # Build endpoint URLs and download both exports.
+        tags_endpoint = f"{api_base_url}/api/data/tags/{query}/tagsmd"
+        content_endpoint = f"{api_base_url}/api/data/content/{query}/contentmd"
+
+        download_export(tags_endpoint, "tags", args.download_dir, api_key)
+        download_export(content_endpoint, "content", args.download_dir, api_key)
         
     except ValueError as e:
         print(f"Configuration error: {e}", file=sys.stderr)
