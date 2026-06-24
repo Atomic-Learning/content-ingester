@@ -67,7 +67,16 @@ Place files in:
   - tags_current.md (or similar tags export)
     - Should list the current platform tag names (one per line or simple grouped lists).
     - Used by the agent to reuse existing tags and only propose new tags when necessary.
-  - new source material in .md or .ipynb format
+  - new source material in .md, .ipynb, or .pdf format
+
+PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/pdf-data-extraction.md`) to extract text and image assets before proposing structure or generating page content. The default run is cross-platform and collision-safe (new suffixed output folders are created unless overwrite is explicitly requested).
+
+If the agent hits blockers while processing PDFs, it should ask the user concise clarifying questions before continuing:
+
+1. Background preference for extracted images: `transparent`, `white`, or `opaque`?
+2. Should vector-only figures be captured with full-page rendering (`--render-vector-pages`)?
+3. If output folders already exist, should extraction overwrite them (`--overwrite`) or create new suffixed folders?
+4. If text extraction quality is low (for scanned PDFs), should the workflow continue with manual review notes, or pause for OCR guidance?
 
 Outputs will be created in outputs/. Template assets may be downloaded to templates/.
 

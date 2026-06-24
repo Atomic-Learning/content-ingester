@@ -2,6 +2,61 @@
 
 This directory contains utility scripts for the content ingester project.
 
+## extract_pdf_assets.py
+
+A cross-platform Python script to process PDFs from `inputs/` by extracting:
+
+- Markdown text using `markitdown`
+- Images using `PyMuPDF` (`pymupdf`)
+
+This avoids OS-specific dependencies such as `pdftotext` and `pdfimages`.
+
+For the agent-facing runbook (including blocker-handling prompts), see `.github/pdf-data-extraction.md`.
+
+### Usage
+
+Basic run over all PDFs in `inputs/`:
+
+```bash
+python tools/extract_pdf_assets.py
+```
+
+Specify image background mode and output location:
+
+```bash
+python tools/extract_pdf_assets.py --background transparent --output-dir outputs/pdf-processing
+```
+
+Render full pages when no embedded raster images are found (useful for vector graphics):
+
+```bash
+python tools/extract_pdf_assets.py --render-vector-pages --render-dpi 200
+```
+
+Allow overwriting existing output directories intentionally:
+
+```bash
+python tools/extract_pdf_assets.py --overwrite
+```
+
+### Output layout
+
+For each `inputs/<name>.pdf`, the script creates:
+
+- `outputs/pdf-processing/<name>/text.md`
+- `outputs/pdf-processing/<name>/resources/*.png`
+
+By default, the script avoids collisions by creating suffixed directories when needed
+(for example, `summary-2`) instead of overwriting previous results.
+
+### Requirements
+
+Install dependencies from `requirements.txt` or directly:
+
+```bash
+python -m pip install markitdown pymupdf
+```
+
 ## generate_inputs.py
 
 A Python script to download content and tags from HTTP export endpoints and save them to the `inputs/` folder.

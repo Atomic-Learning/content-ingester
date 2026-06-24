@@ -1,6 +1,8 @@
 pydot
 networkx
 matplotlib
+markitdown
+pymupdf
 GitPython==3.1.43
 python-dotenv==1.0.0
 PyGithub==2.1.1
