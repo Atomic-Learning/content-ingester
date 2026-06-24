@@ -72,7 +72,7 @@ Place files in:
   - `content-to-ingest/` subfolder:
     - new source material in .md, .ipynb, or .pdf format
 
-PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/pdf-data-extraction.md`) before proposing structure or generating page content. By default, the extractor reads PDFs from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pdf-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
+PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/instructions/pdf-data-extraction.md`) before proposing structure or generating page content. By default, the extractor reads PDFs from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pdf-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
 
 If the agent hits blockers while processing PDFs, it should ask the user concise clarifying questions before continuing:
 

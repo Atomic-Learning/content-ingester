@@ -18,9 +18,9 @@ applyTo: "**"
 - Pause for user approval at each checkpoint and after each generated page.
 - Keep generated ingestion artifacts in the active output directory for the run.
 - Treat PDFs in `<input-dir>/content-to-ingest/` as supported source material.
-- Before using PDF source material for structure or page generation, run `python tools/extract_pdf_assets.py` and follow `.github/pdf-data-extraction.md`.
+- Before using PDF source material for structure or page generation, run `python tools/extract_pdf_assets.py` and follow `.github/instructions/pdf-data-extraction.md`.
 - Reuse existing support docs as references when needed:
   - `.github/instructions/atomisation-guidelines.md`
   - `.github/instructions/updating-proposed-structure.md`
   - `.github/instructions/content_file_details.md`
-  - `.github/pdf-data-extraction.md`
+  - `.github/instructions/pdf-data-extraction.md`
