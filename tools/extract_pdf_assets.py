@@ -5,7 +5,7 @@ This script is the self-contained documentation version of the
 ``tools/README.md`` entry for ``extract_pdf_assets.py``.
 
 Overview:
-    - Extract markdown text with ``markitdown``.
+    - Extract text with ``PyMuPDF`` (``pymupdf``).
     - Extract raster images with ``PyMuPDF`` (``pymupdf``).
     - Avoid OS-specific tools such as ``pdftotext`` and ``pdfimages``.
 
@@ -41,7 +41,7 @@ Output layout:
 Requirements:
     Install dependencies from ``requirements.txt`` or directly::
 
-        python -m pip install markitdown pymupdf
+    python -m pip install pymupdf
 """
 
 from __future__ import annotations
@@ -53,7 +53,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pymupdf
-from markitdown import MarkItDown
 
 
 @dataclass
@@ -63,7 +62,7 @@ class PdfExtractionResult:
     Attributes:
         pdf_path: Input PDF path.
         output_dir: Output directory for this PDF.
-        text_path: Path to extracted markdown text file.
+        text_path: Path to extracted text file.
         embedded_images: Number of embedded images exported.
         rendered_pages: Number of full-page fallback renders produced.
     """
@@ -123,6 +122,26 @@ def _resolve_output_dir(output_root: Path, pdf_path: Path, overwrite: bool) -> P
         suffix += 1
 
 
+def _extract_text(doc: pymupdf.Document) -> str:
+    """Extract page text from a PDF document using PyMuPDF.
+
+    Args:
+        doc: Open PyMuPDF document handle.
+
+    Returns:
+        UTF-8 text with page separators suitable for saving to ``text.md``.
+    """
+    pages: list[str] = []
+    for page_index, page in enumerate(doc):
+        page_text = page.get_text("text").strip()
+        if page_text:
+            pages.append(page_text)
+        else:
+            pages.append(f"[Page {page_index + 1}: no extractable text]")
+
+    return "\n\n---\n\n".join(pages).strip() + "\n"
+
+
 def extract_pdf(
     pdf_path: Path,
     output_root: Path,
@@ -131,7 +150,7 @@ def extract_pdf(
     render_dpi: int,
     overwrite: bool,
 ) -> PdfExtractionResult:
-    """Extract markdown text and image assets from one PDF.
+    """Extract text and image assets from one PDF.
 
     Args:
         pdf_path: Source PDF path.
@@ -149,17 +168,16 @@ def extract_pdf(
     output_dir = _resolve_output_dir(output_root, pdf_path, overwrite)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1) Text extraction with markitdown.
-    md = MarkItDown()
-    result = md.convert(pdf_path.as_posix())
+    doc = pymupdf.open(pdf_path.as_posix())
+
+    # 1) Text extraction with PyMuPDF.
     text_path = output_dir / "text.md"
-    text_path.write_text(result.text_content, encoding="utf-8")
+    text_path.write_text(_extract_text(doc), encoding="utf-8")
 
     # 2) Image extraction with PyMuPDF.
     resources_dir = output_dir / "resources"
     resources_dir.mkdir(parents=True, exist_ok=True)
 
-    doc = pymupdf.open(pdf_path.as_posix())
     embedded_images = 0
     rendered_pages = 0
 
@@ -192,6 +210,7 @@ def extract_pdf(
                 output_path = resources_dir / output_name
                 _save_pixmap(pix, output_path, background)
                 embedded_images += 1
+
         elif render_vector_pages:
             # Some PDFs draw charts/diagrams as vector commands rather than
             # embedded raster images. This fallback rasterizes the full page
@@ -222,7 +241,7 @@ def parse_args() -> argparse.Namespace:
     """
 
     parser = argparse.ArgumentParser(
-        description="Extract markdown text and images from PDFs in a directory.",
+        description="Extract text and images from PDFs in a directory.",
     )
     parser.add_argument(
         "--input-dir",

@@ -6,7 +6,7 @@ This directory contains utility scripts for the content ingester project.
 
 A cross-platform Python script to process PDFs from `inputs/` by extracting:
 
-- Markdown text using `markitdown`
+- Text using `PyMuPDF` (`pymupdf`)
 - Images using `PyMuPDF` (`pymupdf`)
 
 This avoids OS-specific dependencies such as `pdftotext` and `pdfimages`.
@@ -54,7 +54,7 @@ By default, the script avoids collisions by creating suffixed directories when n
 Install dependencies from `requirements.txt` or directly:
 
 ```bash
-python -m pip install markitdown pymupdf
+python -m pip install pymupdf
 ```
 
 ## generate_inputs.py

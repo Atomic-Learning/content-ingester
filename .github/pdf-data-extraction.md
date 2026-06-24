@@ -14,7 +14,7 @@ Run extraction with:
 
 This script handles:
 
-- markdown text extraction via `markitdown`
+- text extraction via `PyMuPDF` (`pymupdf`)
 - image extraction via `PyMuPDF` (`pymupdf`)
 - transparency handling using PDF soft masks
 - optional vector-graphics fallback (full-page rasterisation)
@@ -27,6 +27,19 @@ This script handles:
 3. Run the extractor script (default settings are preferred unless there is a reason to change them).
 4. Confirm artifacts exist under `outputs/pdf-processing/<pdf-name>/`.
 5. Use extracted text/image assets to generate or update page content under `outputs/<slug>/`.
+
+### Mandatory Image Embedding Rule For Page Generation
+
+When creating `outputs/<slug>/content.html` from PDF inputs, do not stop at extraction output.
+
+You must:
+
+1. Copy each image actually used by the page from `outputs/pdf-processing/<pdf-name>/resources/` into `outputs/<slug>/resources/`.
+2. Reference it in `content.html` with a relative path such as `resources/<image-name>.png`.
+3. Include `width` and `height` attributes on each `<img>`.
+4. Confirm the referenced files exist in `outputs/<slug>/resources/` (not only in `outputs/pdf-processing/...`).
+
+If no images are embedded in `content.html` while source PDF images exist, treat this as an incomplete page build.
 
 ## Operational Commands
 
@@ -79,6 +92,7 @@ When the workflow is blocked or ambiguous, ask concise user questions (backgroun
 2. Expected images exist in `resources/`.
 3. No unexpected temporary extraction files remain.
 4. Referenced resources in generated page `content.html` resolve correctly.
+5. If PDF images exist and are relevant, they are copied into `outputs/<slug>/resources/` and embedded in `content.html`.
 
 ## Known Limitations
 
