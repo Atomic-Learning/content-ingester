@@ -16,7 +16,7 @@ Resolve paths from `.env` before running:
 
 - `<input-dir>/live-website-export/current_content.md`
 - `<input-dir>/live-website-export/tags_current.md`
-- New content files in `<input-dir>/content-to-ingest/` (Markdown, notebooks, and PDFs; for PDFs use `.github/instructions/pdf-data-extraction.md` first)
+- New content files in `<input-dir>/content-to-ingest/` (Markdown, notebooks, PDFs, and PPTX files; for PDFs use `.github/instructions/pdf-data-extraction.md` first; for PPTX use `.github/instructions/pptx-data-extraction.md` first)
 - `.github/instructions/atomisation-guidelines.md`
 - `.github/instructions/updating-proposed-structure.md`
 
