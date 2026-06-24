@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """Extract text and images from PDFs in a cross-platform way.
 
-This script is the self-contained documentation version of the
-``tools/README.md`` entry for ``extract_pdf_assets.py``.
-
 Overview:
     - Extract text with ``PyMuPDF`` (``pymupdf``).
     - Extract raster images with ``PyMuPDF`` (``pymupdf``).
     - Avoid OS-specific tools such as ``pdftotext`` and ``pdfimages``.
 
 Usage:
-    Basic run over all PDFs in ``inputs/``::
+    Basic run over all PDFs in ``inputs/content-to-ingest/``::
 
         python tools/extract_pdf_assets.py
 
@@ -30,7 +27,7 @@ Usage:
         python tools/extract_pdf_assets.py --overwrite
 
 Output layout:
-    For each ``inputs/<name>.pdf``, this script creates:
+    For each ``inputs/content-to-ingest/<name>.pdf``, this script creates:
 
     - ``outputs/pdf-processing/<name>/text.md``
     - ``outputs/pdf-processing/<name>/resources/*.png``
@@ -48,11 +45,36 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import pymupdf
+from dotenv import load_dotenv
+
+
+def _find_repo_root() -> Path:
+    for candidate in Path(__file__).resolve().parents:
+        if (candidate / "README.md").exists() and (candidate / ".github").exists():
+            return candidate
+    raise RuntimeError("Unable to determine repository root from script location.")
+
+
+ROOT_DIR = _find_repo_root()
+load_dotenv(ROOT_DIR / ".env")
+
+
+def _resolve_dir_from_env(var_name: str, fallback: str) -> Path:
+    value = os.getenv(var_name, fallback).strip()
+    path = Path(value)
+    if not path.is_absolute():
+        path = ROOT_DIR / path
+    return path
+
+
+DEFAULT_INPUT_DIR = _resolve_dir_from_env("CONTENT_INGESTER_INPUTS_DIR", "inputs") / "content-to-ingest"
+DEFAULT_OUTPUT_DIR = _resolve_dir_from_env("CONTENT_INGESTER_OUTPUTS_DIR", "outputs") / "pdf-processing"
 
 
 @dataclass
@@ -246,14 +268,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--input-dir",
         type=Path,
-        default=Path("inputs"),
-        help="Directory containing PDF files (default: inputs).",
+        default=DEFAULT_INPUT_DIR,
+        help="Directory containing PDF files (default: <inputs-dir>/content-to-ingest).",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("outputs/pdf-processing"),
-        help="Directory for extracted assets (default: outputs/pdf-processing).",
+        default=DEFAULT_OUTPUT_DIR,
+        help="Directory for extracted assets (default: <outputs-dir>/pdf-processing).",
     )
     parser.add_argument(
         "--background",

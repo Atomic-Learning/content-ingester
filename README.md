@@ -4,9 +4,9 @@ This repository supports the Atomic Learning content-ingestion workflow:
 
 1. Start from source teaching material in inputs.
 2. Propose atomic pages and their prerequisite structure.
-3. Review the structure of all proposed pages as a whole and finalise.
-4. Create and review page content one page at a time, in dependency order.
-5. Publish each page to GitHub and sync to the learning site, one at a time.
+3. Build page folders with metadata and HTML content.
+4. Validate structure and consistency.
+5. Publish pages as one GitHub repository per page.
 
 The process is designed so a human editor can run it end-to-end with clear checkpoints.
 
@@ -46,30 +46,33 @@ pip install -r requirements.txt
 ### GitHub API access
 
 A GitHub Personal Access Token (PAT) with repo permissions is required to publish content.
-Create .env from .env.example and set your token:
-
-```dotenv
-GITHUB_PAT=your_github_pat_here
-```
+Add your token to a `.env` file `GITHUB_PAT=your_github_pat_here`.
 
 ## Workflow
 
-The agent instructions provided in this repository contains the full process of content ingestion and should be able to produce a sensible output from input content without human intervention. Nevertheless, it is recommended to guide the agent following the checkpoints described below to ensure high-quality output.
+The agent instructions provided in this repository contain the full process of content ingestion and should be able to produce sensible output from input content without human intervention. Nevertheless, it is recommended to guide the agent using the checkpoints below to ensure high-quality output.
 
 ### Before you start
 
+The ingestion agent resolves these directories at run start:
+
+- Input directory: `CONTENT_INGESTER_INPUTS_DIR` (default `inputs/`)
+- Output directory: `CONTENT_INGESTER_OUTPUTS_DIR` (default `outputs/`)
+
 Place files in:
 
-- inputs/
-  - current_content.md (or similarly named existing content export)
-    - Should list existing page slugs with brief descriptions and prerequisite/related links where available.
-    - Used by the agent to avoid duplicating already-published content and to validate prerequisite references.
-  - tags_current.md (or similar tags export)
-    - Should list the current platform tag names (one per line or simple grouped lists).
-    - Used by the agent to reuse existing tags and only propose new tags when necessary.
-  - new source material in .md, .ipynb, or .pdf format
+- `CONTENT_INGESTER_INPUTS_DIR` (for example `inputs/`):
+  - `live-website-export/` subfolder:
+    - current_content.md (or similarly named existing content export)
+      - Should list existing page slugs with brief descriptions and prerequisite/related links where available.
+      - Used by the agent to avoid duplicating already-published content and to validate prerequisite references.
+    - tags_current.md (or similar tags export)
+      - Should list the current platform tag names (one per line or simple grouped lists).
+      - Used by the agent to reuse existing tags and only propose new tags when necessary.
+  - `content-to-ingest/` subfolder:
+    - new source material in .md, .ipynb, or .pdf format
 
-PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/pdf-data-extraction.md`) to extract text and image assets before proposing structure or generating page content. The default run is cross-platform and collision-safe (new suffixed output folders are created unless overwrite is explicitly requested).
+PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/pdf-data-extraction.md`) before proposing structure or generating page content. By default, the extractor reads PDFs from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pdf-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
 
 If the agent hits blockers while processing PDFs, it should ask the user concise clarifying questions before continuing:
 
@@ -78,78 +81,76 @@ If the agent hits blockers while processing PDFs, it should ask the user concise
 3. If output folders already exist, should extraction overwrite them (`--overwrite`) or create new suffixed folders?
 4. If PyMuPDF text extraction quality is low (for scanned PDFs), should the workflow continue with manual review notes, or pause for OCR guidance?
 
-Outputs will be created in outputs/. Template assets may be downloaded to templates/.
+Outputs will be created in the configured output directory (default `outputs/`). Template assets may be downloaded to `templates/`.
 
 ### Checkpoint 1: Structure proposal
 
 Prompt the agent to create the proposed structure from the input files, for example:
 
-"Read everything in inputs/ and produce outputs/proposed_structure.json using .github/proposed-structure-format.md and .github/atomisation-guidelines.md. Then generate outputs/dependency_graph.md from proposed_structure and summarise key risks."
+`Create <output-dir>/proposed_structure.json from <input-dir>/, then generate <output-dir>/dependency_graph.md and summarise key risks.`
 
 Review before approval:
 
-1. outputs/proposed_structure.json has required keys and complete page entries.
+1. `<output-dir>/proposed_structure.json` has required keys and complete page entries.
 2. Page slugs and prerequisites make sense for your curriculum.
 3. status is used correctly (new vs missing prerequisites).
-4. outputs/dependency_graph.md has no obvious circular dependencies.
+4. `<output-dir>/dependency_graph.md` has no obvious circular dependencies.
 5. Proposed tags align with current tags, with any new tags clearly justified.
 
-### Checkpoint 2: Per-page content creation
+### Checkpoint 2: Page generation
 
-Pages are created one at a time, in dependency order (prerequisites first). For each page, prompt the agent to generate it and review it before moving on, for example:
+Prompt the agent to generate the next page folder and content, for example:
 
-"Generate the next page from outputs/proposed_structure.json that hasn't been created yet. Create the page folder in outputs/<slug>/ with metadata.json, content.html, license.md, resources/, and resources/.gitkeep. Follow .github/content_file_details.md."
+`Using approved <output-dir>/proposed_structure.json, generate the next page at <output-dir>/<slug>/ with all required files.`
 
-Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in outputs/. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
+Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in the configured output directory. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
 
-Review before approving each page:
-
-1. Page folder contains all required files.
+1. Each page folder contains all required files.
 2. metadata.json slug matches folder name.
 3. content.html follows house rules (no h1, UK English, clean HTML).
 4. Prerequisites and related content are plausible and consistent.
-5. Page has a single, focused learning objective.
+5. Spot-check 3 to 5 pages for quality and scope (single learning objective).
 
 ### Checkpoint 3: Consistency and recommendations
 
-Once all pages have been created and individually reviewed, prompt the agent to run a consistency pass and generate recommendations, for example:
+Prompt the agent to run a consistency pass and generate recommendations, for example:
 
-"Run a full consistency pass across outputs/, fix metadata/linking issues, regenerate outputs/dependency_graph.md from metadata, and create outputs/related_content_recommendations.md for existing platform pages."
+`Run a full consistency pass on <output-dir>/, fix metadata/linking issues, regenerate dependency_graph.md, and create related_content_recommendations.md.`
 
 Review before approval:
 
 1. Final graph still has no circular dependencies.
 2. No broken or unknown prerequisite slugs remain.
-3. related_content_recommendations.md is specific and actionable.
+3. `related_content_recommendations.md` is specific and actionable.
 
-### Checkpoint 4: Per-page publish
+### Checkpoint 4: Publish
 
-Pages are published one at a time, in the same dependency order used during content creation. For each page, prompt the agent to upload it, register it with the site, and review it before moving on, for example:
+Prompt the agent to run the publish workflow for one page at a time, for example:
 
-"Upload outputs/<slug>/ to GitHub using tools/github_uploader.py, register the new repository with the Atomic Learning site, trigger a sync, and share the live URL for review."
+`Run Stage 5 (upload-and-check) for <output-dir>/<slug>/.`
 
 Review before approving each page:
 
 1. The correct repository was created on GitHub.
-2. outputs/upload_summary.txt has been updated to reflect all uploads so far.
+2. `<output-dir>/upload_summary.txt` has been updated to reflect all uploads so far.
 3. The page appears correctly on the live site.
 4. Prerequisites and related content resolve to valid pages on the site.
 
 Once all pages have been published, prompt the agent to generate the final upload summary:
 
-"Report all created, skipped, and failed repositories and write outputs/upload_summary.txt."
+`Write <output-dir>/upload_summary.txt with created, skipped, and failed repositories.`
+
+### Validation workflow prompt
+
+Use the Workflow Validation Assistant for regression checks.
+
+Prompt:
+
+`Run validate-workflow for all cases in workflow-validation/.`
 
 ## Minimal Checklist
 
 1. Approve proposed_structure.json and dependency_graph.md.
-2. Approve each page's content individually as it is generated (in dependency order).
+2. Approve generated page files and metadata quality.
 3. Approve final consistency pass and recommendations.
-4. Approve each page's upload and site appearance individually (in dependency order).
-
-## Developers
-
-Focused guidance for developers of the content ingester
-
-### Workflow Validation
-
-Developers should run this validation process whenever they change workflow or agent behaviour (for example changes to instructions, atomisation guidance, or generation/comparison logic). See [Workflow Validation](workflow-validation/README.md) for details.
+4. Approve publish results and final upload summary.

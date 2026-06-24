@@ -5,9 +5,18 @@ This folder contains regression validation cases for workflow and agent changes.
 ## How To Use
 
 1. Prompt the agent to run the validation workflow.
-2. Read `workflow-validation/validation-report.md`.
-3. Decide whether divergences from expected outputs are acceptable for the change, or indicate regression risk.
-4. The validation report is committed to the repository, so there is a clear trail of current divergence from ideal behaviour.
+2. Ensure validation runs are isolated by using per-case folders directly.
+3. Read `workflow-validation/validation-report.md`.
+4. Decide whether divergences from expected outputs are acceptable for the change, or indicate regression risk.
+5. The validation report is committed to the repository, so there is a clear trail of current divergence from ideal behaviour.
+
+Recommended command flow per case:
+
+```bash
+python .github/skills/validate-workflow/validation_clean_case_outputs.py --case <case-name>
+# Run generation against workflow-validation/<case-name>/inputs -> workflow-validation/<case-name>/generated-outputs
+python .github/skills/validate-workflow/validation_compare_case.py --case <case-name> --report workflow-validation/validation-report.md
+```
 
 ## Case Layout
 

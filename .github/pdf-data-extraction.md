@@ -6,6 +6,11 @@ This guide defines the current, cross-platform process for extracting PDF text a
 
 Use the script-based workflow only. Do not rely on OS-specific tools.
 
+Default paths are resolved from `.env`:
+
+- `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)
+- `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
+
 ## Canonical Tool
 
 Run extraction with:
@@ -23,21 +28,21 @@ This script handles:
 ## Standard Run Procedure
 
 1. Ensure dependencies are installed from `requirements.txt`.
-2. Put source PDFs in `inputs/`.
+2. Put source PDFs in `<input-dir>/content-to-ingest/` (default `inputs/content-to-ingest/`).
 3. Run the extractor script (default settings are preferred unless there is a reason to change them).
-4. Confirm artifacts exist under `outputs/pdf-processing/<pdf-name>/`.
-5. Use extracted text/image assets to generate or update page content under `outputs/<slug>/`.
+4. Confirm artifacts exist under `<output-dir>/pdf-processing/<pdf-name>/` (default `outputs/pdf-processing/<pdf-name>/`).
+5. Use extracted text/image assets to generate or update page content under `<output-dir>/<slug>/`.
 
 ### Mandatory Image Embedding Rule For Page Generation
 
-When creating `outputs/<slug>/content.html` from PDF inputs, do not stop at extraction output.
+When creating `<output-dir>/<slug>/content.html` from PDF inputs, do not stop at extraction output.
 
 You must:
 
-1. Copy each image actually used by the page from `outputs/pdf-processing/<pdf-name>/resources/` into `outputs/<slug>/resources/`.
+1. Copy each image actually used by the page from `<output-dir>/pdf-processing/<pdf-name>/resources/` into `<output-dir>/<slug>/resources/`.
 2. Reference it in `content.html` with a relative path such as `resources/<image-name>.png`.
 3. Include `width` and `height` attributes on each `<img>`.
-4. Confirm the referenced files exist in `outputs/<slug>/resources/` (not only in `outputs/pdf-processing/...`).
+4. Confirm the referenced files exist in `<output-dir>/<slug>/resources/` (not only in `<output-dir>/pdf-processing/...`).
 
 If no images are embedded in `content.html` while source PDF images exist, treat this as an incomplete page build.
 
@@ -69,10 +74,10 @@ python tools/extract_pdf_assets.py --overwrite
 
 ## Output Contract
 
-For each `inputs/<name>.pdf`, expect:
+For each `<input-dir>/content-to-ingest/<name>.pdf`, expect:
 
-- `outputs/pdf-processing/<name>/text.md`
-- `outputs/pdf-processing/<name>/resources/*.png`
+- `<output-dir>/pdf-processing/<name>/text.md`
+- `<output-dir>/pdf-processing/<name>/resources/*.png`
 
 If folder-name collisions occur and `--overwrite` is not set, the script writes to suffixed folders (for example `summary-2`).
 
@@ -92,7 +97,7 @@ When the workflow is blocked or ambiguous, ask concise user questions (backgroun
 2. Expected images exist in `resources/`.
 3. No unexpected temporary extraction files remain.
 4. Referenced resources in generated page `content.html` resolve correctly.
-5. If PDF images exist and are relevant, they are copied into `outputs/<slug>/resources/` and embedded in `content.html`.
+5. If PDF images exist and are relevant, they are copied into `<output-dir>/<slug>/resources/` and embedded in `content.html`.
 
 ## Known Limitations
 
@@ -102,6 +107,6 @@ When the workflow is blocked or ambiguous, ask concise user questions (backgroun
 ## Related References
 
 - `tools/extract_pdf_assets.py`
-- `tools/README.md`
-- `.github/proposed-structure-format.md`
-- `.github/atomisation-guidelines.md`
+- `.github/instructions/content-ingestion.instructions.md`
+- `.github/instructions/updating-proposed-structure.md`
+- `.github/instructions/atomisation-guidelines.md`
