@@ -14,15 +14,20 @@ Close # (issue)
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] Breaking change (whatever its nature)
 
+## Validation
+
+- [ ] If this PR changes workflow or agent behaviour (for example instructions, atomisation guidance, or generation/comparison logic), I have run the validation workflow and checked `workflow-validation/validation-report.md`.
+
 <!--
 No tests or pre-commit at the moment
 ## Key checklist
 
 - [ ] All tests pass (eg. `python -m pytest`)
 - [ ] Pre-commit hooks run successfully (eg. `pre-commit run --all-files`)
--->
+
 ## Further checks
 
 - [ ] Code is commented, particularly in hard-to-understand areas
 - [ ] Tests added or an issue has been opened to tackle that in the future.
   (Indicate issue here: # (issue))
+-->
