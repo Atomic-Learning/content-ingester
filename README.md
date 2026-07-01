@@ -74,13 +74,6 @@ Place files in:
 
 PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/instructions/pdf-data-extraction.md`) before proposing structure or generating page content. By default, the extractor reads PDFs from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pdf-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
 
-If the agent hits blockers while processing PDFs, it should ask the user concise clarifying questions before continuing:
-
-1. Background preference for extracted images: `transparent`, `white`, or `opaque`?
-2. Should vector-only figures be captured with full-page rendering (`--render-vector-pages`)?
-3. If output folders already exist, should extraction overwrite them (`--overwrite`) or create new suffixed folders?
-4. If PyMuPDF text extraction quality is low (for scanned PDFs), should the workflow continue with manual review notes, or pause for OCR guidance?
-
 Outputs will be created in the configured output directory (default `outputs/`). Template assets may be downloaded to `templates/`.
 
 ### Checkpoint 1: Structure proposal
