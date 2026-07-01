@@ -81,7 +81,7 @@ If the agent hits blockers while processing PDFs, it should ask the user concise
 3. If output folders already exist, should extraction overwrite them (`--overwrite`) or create new suffixed folders?
 4. If PyMuPDF text extraction quality is low (for scanned PDFs), should the workflow continue with manual review notes, or pause for OCR guidance?
 
-PPTX files are supported. For PPTX files, the agent should use `tools/extract_pptx_assets.py` (documented in `.github/instructions/pptx-data-extraction.md`) before proposing structure or generating page content. By default, the extractor reads PPTX files from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pptx-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
+PPTX files are supported. For PPTX files, the agent should use `tools/extract_pptx_assets.py` (documented in `.github/instructions/pptx-data-extraction.md`) before proposing structure or generating page content. The agent should do this without prompting from you. By default, the extractor reads PPTX files from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pptx-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
 
 If the agent hits blockers while processing PPTX files, it should ask the user concise clarifying questions before continuing:
 
