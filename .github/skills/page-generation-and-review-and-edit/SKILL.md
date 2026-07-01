@@ -18,7 +18,7 @@ Resolve paths from `.env` before running:
 
 ## Required per-page output structure
 - `<output-dir>/<slug>/metadata.json`
-- `<output-dir>/<slug>/content.html`
+- `<output-dir>/<slug>/content.md`
 - `<output-dir>/<slug>/license.md`
 - `<output-dir>/<slug>/resources/`
 - `<output-dir>/<slug>/resources/.gitkeep`
