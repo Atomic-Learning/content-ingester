@@ -8,7 +8,7 @@ This file contains the content as it will appear on the page. It should be writt
 * The page must not contain a `<h1>` tag, as the title of the page will be taken from the `metadata.json` file and inserted as a `<h1>` automatically by the platform. Most tags in the `content.html` files will be `<h2>`, but `<h3>` or lower tags may be nested within them where appropriate.
 * Do not repeat the page title as a heading in the content. 
 * The html content should avoid using `style` where possible, as styling with be handled by a global stylesheet on the platform. If styling is needed, try to use semantic html tags where possible (e.g. `<em>` for emphasis, `<strong>` for strong emphasis) rather than using `style` attributes. 
-* For images, specify the width and height attributes to help with page layout, but avoid using `style` attributes to set the size of images.
+* For images, specify the width or height attribute to help with page layout, but avoid using `style` attributes to set the size of images.
 * For non-interactive code blocks, use the `<pre><code>` tags to format the code.
 * When adding <pre><code> blocks, do not insert line breaks directly after the opening `<code>` tag or directly before the closing `</code>` tag, as this can cause unwanted whitespace in the rendered content.
 * When including code snippets or literal values (in the programming sense) in paragraphs of prose, use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`. For numeric values, use <code> tags where it is referring to the character in the code, but omit it if referring to the numeric value.
