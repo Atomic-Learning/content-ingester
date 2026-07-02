@@ -12,6 +12,7 @@ import os
 import sys
 import argparse
 from pathlib import Path
+from urllib.parse import urlsplit
 from git import Repo
 from dotenv import load_dotenv
 
@@ -61,23 +62,11 @@ def parse_github_url(url: str) -> tuple[str, str]:
     Returns:
         tuple: (owner, repo_name)
     """
-    # Remove .git suffix if present
-    url = url.rstrip("/")
-    if url.endswith(".git"):
-        url = url[:-4]
-    
-    # Extract from HTTPS URL
-    if "github.com/" in url:
-        parts = url.split("github.com/")[1].split("/")
-        if len(parts) >= 2:
-            return parts[0], parts[1]
-    
-    # Extract from SSH URL
-    if "github.com:" in url:
-        parts = url.split("github.com:")[1].split("/")
-        if len(parts) >= 2:
-            return parts[0], parts[1]
-    
+    repo_path = _extract_repo_path(url)
+    parts = repo_path.split("/")
+    if len(parts) >= 2:
+        return parts[0], parts[1]
+
     raise ValueError(f"Invalid GitHub URL format: {url}")
 
 
@@ -92,21 +81,29 @@ def build_authenticated_url(url: str, token: str) -> str:
     Returns:
         str: Authenticated URL with token embedded
     """
-    # Extract owner/repo part from various URL formats
-    repo_path = url
-    
-    # Remove .git suffix if present
-    if repo_path.endswith(".git"):
-        repo_path = repo_path[:-4]
-    
-    # Extract from HTTPS URL
-    if "github.com/" in repo_path:
-        repo_path = repo_path.split("github.com/")[1]
-    # Extract from SSH URL
-    elif "github.com:" in repo_path:
-        repo_path = repo_path.split("github.com:")[1]
-    
+    repo_path = _extract_repo_path(url)
     return f"https://{token}@github.com/{repo_path}.git"
+
+
+def _extract_repo_path(url: str) -> str:
+    """Extract the owner/repository path from a supported GitHub URL."""
+    normalized = url.rstrip("/")
+    if normalized.endswith(".git"):
+        normalized = normalized[:-4]
+
+    if normalized.startswith("git@github.com:"):
+        repo_path = normalized.removeprefix("git@github.com:")
+    else:
+        parsed = urlsplit(normalized)
+        if parsed.scheme not in {"http", "https"} or parsed.netloc != "github.com":
+            raise ValueError(f"Invalid GitHub URL format: {url}")
+        repo_path = parsed.path.lstrip("/")
+
+    parts = [part for part in repo_path.split("/") if part]
+    if len(parts) < 2:
+        raise ValueError(f"Invalid GitHub URL format: {url}")
+
+    return "/".join(parts[:2])
 
 
 def download_repository(repo_url: str, target_dir: str, token: str):
