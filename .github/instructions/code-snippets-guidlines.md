@@ -8,6 +8,14 @@ This file describes how to include code within content.md pages.
 ```py-cell
 print("Hello, world!")
 ```
+* If interactive Python cells require packages outside of the standard library, these should be added at the end of the main object in metadata.json file in a list under the key "python_packages". For example:
+```json
+"python_packages": [
+        "numpy",
+        "pandas"
+    ]
+}
+```
 * Interactive R code cells are supported in the platform and should be surrounded with triple backticks, with the opening backticks followed by "r-cell". For example:
 ```r-cell
 print("Hello, world!")
