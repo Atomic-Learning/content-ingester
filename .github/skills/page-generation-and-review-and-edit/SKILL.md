@@ -16,6 +16,7 @@ Resolve paths from `.env` before running:
 - `<input-dir>/current_content.md`
 - `.github/instructions/content_file_details.md`
 - `.github/instructions/pdf-data-extraction.md` (mandatory image-embedding rules when source material includes PDFs)
+- `.github/instructions/pptx-data-extraction.md` (mandatory image-embedding rules when source material includes PPTX files)
 
 ## Required per-page output structure
 - `<output-dir>/<slug>/metadata.json`
