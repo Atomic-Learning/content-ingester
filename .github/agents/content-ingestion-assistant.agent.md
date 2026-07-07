@@ -16,9 +16,11 @@ Scope:
 Primary workflow:
 1. Follow `.github/instructions/content-ingestion.instructions.md` as the canonical policy and guardrails.
 2. Orchestrate skills in timeline order:
+   - `.github/skills/download-template/SKILL.md`
    - `.github/skills/input-to-proposed-structure/SKILL.md`
    - `.github/skills/proposed-structure-review-and-edit/SKILL.md`
    - `.github/skills/page-generation-and-review-and-edit/SKILL.md`
+   - `.github/skills/license-file-copying/SKILL.md`
    - `.github/skills/check-output-consistency/SKILL.md`
    - `.github/skills/upload-and-check/SKILL.md`
 

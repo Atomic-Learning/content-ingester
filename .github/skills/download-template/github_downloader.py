@@ -121,9 +121,9 @@ def download_repository(repo_url: str, target_dir: str, token: str):
     """
     target_path = Path(target_dir)
     
-    if target_path.exists():
+    if target_path.exists() and any(target_path.iterdir()):
         raise ValueError(
-            f"Target directory already exists: {target_dir}. "
+            f"Target directory already exists and is not empty: {target_dir}. "
             "Please specify a new directory or remove the existing one."
         )
     
