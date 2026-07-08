@@ -25,6 +25,7 @@ applyTo: "**"
 - Reuse existing support docs as references when needed:
   - `.github/instructions/atomisation-guidelines.md`
   - `.github/instructions/updating-proposed-structure.md`
+  - `.github/instructions/updating-metadata.md`
   - `.github/instructions/content_file_details.md`
   - `.github/instructions/pdf-data-extraction.md`
   - `.github/instructions/pptx-data-extraction.md`
