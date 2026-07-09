@@ -59,6 +59,8 @@ The ingestion agent resolves these directories at run start:
 - Input directory: `CONTENT_INGESTER_INPUTS_DIR` (default `inputs/`)
 - Output directory: `CONTENT_INGESTER_OUTPUTS_DIR` (default `outputs/`)
 
+Retrieve content and tag input files from the [live website](http://atomic.dept.ic.ac.uk/data) data hub. You can select the specific tags you need from the list of all the current ones in the platform. You may also filter the tags through the search bar to make it easier to navigate through them. Once the necessary tags are selected you can download both the files.
+
 Place files in:
 
 - `CONTENT_INGESTER_INPUTS_DIR` (for example `inputs/`):
