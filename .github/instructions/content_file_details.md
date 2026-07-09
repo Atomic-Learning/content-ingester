@@ -1,37 +1,25 @@
-This file contains a more detailed specification of the format of content that should be created, including rules on format and style which should be followed when creating the content pages.
+This file contains a more detailed specification of the format of content that should be created, including rules on format and style which should be followed when creating the content pages. Content files are created in Markdown format; the platform's downstream pipeline will convert these to HTML for rendering.
+    
+## `content.md` file
 
-## `content.html` file
-
-This file contains the content as it will appear on the page. It should be written in html format. There are several rules which should be followed:
+This file contains the content as it will appear on the page. It should be written in Markdown format. There are several rules which should be followed:
 
 * If creating new content or editing existing content, use UK English (e.g. "organisation" instead of "organization", "colour" instead of "color", etc.) to maintain consistency with existing content. An exception to this is when quoting or referring to specific content that uses US English (such as names of functions in programming contexts), in which case the original spelling should be retained.
-* The page must not contain a `<h1>` tag, as the title of the page will be taken from the `metadata.json` file and inserted as a `<h1>` automatically by the platform. Most tags in the `content.html` files will be `<h2>`, but `<h3>` or lower tags may be nested within them where appropriate.
-* Do not repeat the page title as a heading in the content. 
-* The html content should avoid using `style` where possible, as styling with be handled by a global stylesheet on the platform. If styling is needed, try to use semantic html tags where possible (e.g. `<em>` for emphasis, `<strong>` for strong emphasis) rather than using `style` attributes. 
-* For images, specify the width or height attribute to help with page layout, but avoid using `style` attributes to set the size of images.
-* For non-interactive code blocks, use the `<pre><code>` tags to format the code.
-* When adding <pre><code> blocks, do not insert line breaks directly after the opening `<code>` tag or directly before the closing `</code>` tag, as this can cause unwanted whitespace in the rendered content.
-* When including code snippets or literal values (in the programming sense) in paragraphs of prose, use the `<code>` tag to format the code. For example, `<code>print("Hello, world!")</code>`. For numeric values, use <code> tags where it is referring to the character in the code, but omit it if referring to the numeric value.
-* If the code is in a specific programming language, include the language as a class on the `<code>` tag (e.g. `<code class="language-python">` for Python code). This will allow for syntax highlighting on the platform. If code is pseudocode, do not specify a class.
-* Interactive Python code cells are supported in the platform and should be included inside the `<py-cell>` tag. For example:
-```html<py-cell>
-print("Hello, world!")
-</py-cell>
-```
-* Interactive R code cells are supported in the platform and should be included inside the `<r-cell>` tag. For example:
-```html<r-cell>
-print("Hello, world!")
-</r-cell>
-```
-* Interactive code cells should be used where it would be useful for the user to be able to run the code and see the output for themselves. In these cases, the code does not need comments preempting the output.
-* Mathematical content may be rendered in mathmode using a single $ to enclose inline maths or $$ to enclose display maths. For example, $E=mc^2$ or $$E=mc^2$$. The platform uses MathJax to render mathematical content, so any syntax supported by MathJax can be used in the content.
+* The page should not contain an initial heading which replicates the title, as the title of the page will be taken from the `metadata.json` file and inserted automatically by the platform. Most headings will be high-level ("#") and should break the page into sections to aid readability and accessibility. Pages are generally short, so deeper subheadings ("##" or "###") are not usually needed, but can be used where appropriate. Headings should be descriptive and concise.
+* Standard Markdown constructs should be used for all content. HTML tags are permitted as a fallback when Markdown has no suitable equivalent.
+* When HTML is necessary, avoid inline `style` attributes, as styling will be handled by the platform's global stylesheet.
+* For images, use standard Markdown syntax (`![alt text](image.png)`). Alt-text should always be provided. If you are unclear what alt-text to use, ask the user for input. Image files should be included in the `resources` directory and referenced using relative paths.
+* When formatting code, follow the guidelines in the `code-snippets-guidelines.md` file.
+* Mathematical content may be rendered using the instructions in the `maths-guidelines.md` file.
 * When rendered a mathematical derivation or a sequence of logical steps, it can be helpful to break the content into a sequence of steps, consider using the `aligned` environment to break the content into multiple lines and align it at the equals sign or other relevant symbol.
-* When pseudocode is used to demonstrate programming concepts in a language-agnostic way, the corresponding metadata file should include the "pseudocode" tag.
+* Hyperlinks should be used to link to external resources (such as the webpage of a software package). Use the standard Markdown syntax for hyperlinks (`[link text](url)`).
+* Links should not be provided in `content.md` to other pages on the platform, as these will be automatically generated by the platform based on the `related` and `prerequisites` fields in the `metadata.json` file.
+* Ordered and unordered lists should be used where appropriate to break up the content and make it easier to read. Ensure a blank line is included before and after the list, and that each item in the list is on a separate line.
 * Avoid adding "Summary", "Key Takeaways", or similar sections at the end of the content. These pages will generally be short enough that summaries shouldn't be necessary.
 
 ### Guidance for Sample Solutions for Coding Problems
 
-* Aim to break the solution into a sequence of logical steps, each with a short explanatory paragraph (`<p>`) before a code cell.
+* Aim to break the solution into a sequence of logical steps, each with a short explanatory paragraph before a code cell.
 * Each code cell should focus on a single operation or concept, and the explanation should help the learner understand what to expect or why the step is important.
 * Avoid including output comments in code cells—users can run the code to see the output themselves.
 * Avoid summary sections at the end - most pages will be short enough not to warrant them. Instead, weave key insights into the explanations between code cells.
@@ -52,4 +40,4 @@ This file contains the metadata for the page, including the title, description, 
 
 ## `resources` directory
 
-This directory should contain any resources (e.g. images, data files) that are needed for the page. These should be referenced in the `content.html` file using relative paths. For example, if there is an image named `example.png` in the `resources` directory, it should be referenced in the `content.html` file as `<img src="resources/example.png">`.
+This directory should contain any resources (e.g. images, data files) that are needed for the page. These should be referenced in the `content.md` file using relative paths. For example, if there is an image named `example.png` in the `resources` directory, it should be referenced in the `content.md` file as `![Alt text](resources/example.png)`.

@@ -15,6 +15,7 @@ applyTo: "**"
 ## Non-negotiable Rules
 
 - Keep work in dependency order.
+- Before proposing structure or generating pages, download the content template repository (`https://github.com/Atomic-Learning/content-template`) into `templates/` by following `.github/skills/download-template/SKILL.md`. Do not continue until the template files are present in `templates/`.
 - Pause for user approval at each checkpoint and after each generated page.
 - Keep generated ingestion artifacts in the active output directory for the run.
 - Treat PDFs and PPTX files in `<input-dir>/content-to-ingest/` as supported source material.
