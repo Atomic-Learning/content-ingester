@@ -2,10 +2,8 @@
 GitHub Repository Downloader
 
 Downloads the content of a GitHub repository to a specified directory.
-Uses a GitHub Personal Access Token (PAT) for authentication.
-
-The token should be stored in a .env file in the project root:
-    GITHUB_PAT=your_token_here
+Uses a GitHub Personal Access Token (PAT) when available, and falls back
+to unauthenticated HTTPS clone URLs for public repositories.
 """
 
 import os
@@ -24,27 +22,12 @@ def _find_repo_root() -> Path:
     raise RuntimeError("Unable to determine repository root from script location.")
 
 
-def load_github_token():
-    """
-    Load GitHub PAT from .env file.
-    
-    Returns:
-        str: GitHub Personal Access Token
-        
-    Raises:
-        ValueError: If GITHUB_PAT is not found in .env file
-    """
-    # Load environment variables from .env file in project root
+def load_github_token_optional() -> str | None:
+    """Load GitHub PAT from .env if present; return None when unavailable."""
     env_path = _find_repo_root() / ".env"
     load_dotenv(env_path)
-    
     token = os.getenv("GITHUB_PAT")
-    if not token:
-        raise ValueError(
-            f"GITHUB_PAT not found in .env file at {env_path}. "
-            "Please create a .env file with: GITHUB_PAT=your_token_here"
-        )
-    return token
+    return token if token else None
 
 
 def parse_github_url(url: str) -> tuple[str, str]:
@@ -70,19 +53,21 @@ def parse_github_url(url: str) -> tuple[str, str]:
     raise ValueError(f"Invalid GitHub URL format: {url}")
 
 
-def build_authenticated_url(url: str, token: str) -> str:
+def build_clone_url(url: str, token: str | None = None) -> str:
     """
-    Build an authenticated GitHub URL using a PAT.
-    
+    Build a canonical HTTPS clone URL for a GitHub repository.
+
     Args:
         url: GitHub repository URL
-        token: GitHub Personal Access Token
-        
+        token: Optional GitHub Personal Access Token
+
     Returns:
-        str: Authenticated URL with token embedded
+        str: HTTPS clone URL, optionally with embedded token
     """
     repo_path = _extract_repo_path(url)
-    return f"https://{token}@github.com/{repo_path}.git"
+    if token:
+        return f"https://{token}@github.com/{repo_path}.git"
+    return f"https://github.com/{repo_path}.git"
 
 
 def _extract_repo_path(url: str) -> str:
@@ -106,14 +91,14 @@ def _extract_repo_path(url: str) -> str:
     return "/".join(parts[:2])
 
 
-def download_repository(repo_url: str, target_dir: str, token: str):
+def download_repository(repo_url: str, target_dir: str, token: str | None = None):
     """
     Clone a GitHub repository to the specified directory.
     
     Args:
         repo_url: GitHub repository URL
         target_dir: Target directory for the cloned repository
-        token: GitHub Personal Access Token
+        token: Optional GitHub Personal Access Token
         
     Raises:
         ValueError: If target directory already exists
@@ -128,13 +113,13 @@ def download_repository(repo_url: str, target_dir: str, token: str):
         )
     
     try:
-        auth_url = build_authenticated_url(repo_url, token)
+        clone_url = build_clone_url(repo_url, token)
         owner, repo = parse_github_url(repo_url)
         
         print(f"Downloading {owner}/{repo}...")
         print(f"Target directory: {target_path.absolute()}")
         
-        Repo.clone_from(auth_url, target_dir)
+        Repo.clone_from(clone_url, target_dir)
         
         print(f"✓ Successfully downloaded to {target_dir}")
         
@@ -160,9 +145,8 @@ def main():
     args = parser.parse_args()
     
     try:
-        # Load GitHub token
-        token = load_github_token()
-        
+        token = load_github_token_optional()
+
         # Determine target directory
         if args.directory:
             target_dir = args.directory
