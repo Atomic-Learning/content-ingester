@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "metadata.schema.json",
+  "title": "Page Metadata Schema",
+  "description": "Schema for validating the metadata.json file for a content page.",
+  "type": "object",
+  "required": ["title", "slug", "description", "authors", "tags", "duration", "prerequisites", "related"],
+  "additionalProperties": false,
+  "properties": {
+
+    "title": {
+      "type": "string",
+      "description": "A short, descriptive title for the page. Major words typically come before minor words (e.g. 'GitHub: Introduction').",
+      "minLength": 1,
+      "maxLength": 100
+    },
+
+    "slug": {
+      "type": "string",
+      "description": "A URL-friendly version of the title. Lowercase, hyphen-separated, with special characters removed.",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 1,
+      "maxLength": 100
+    },
+
+    "description": {
+      "type": "string",
+      "description": "A concise summary of the page content, used in search results and SEO metadata.",
+      "minLength": 1,
+      "maxLength": 500
+    },
+
+    "authors": {
+      "type": "array",
+      "description": "A list of authors who contributed to the page content.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+
+    "tags": {
+      "type": "array",
+      "description": "A list of high-level tags relevant to the page content, used for filtering across the platform.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+
+    "duration": {
+      "type": "integer",
+      "description": "Estimated time in minutes to complete the page content.",
+      "minimum": 1
+    },
+
+    "prerequisites": {
+      "type": "array",
+      "description": "A list of page slugs that should be completed before this page.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+
+    "related": {
+      "type": "array",
+      "description": "A list of page slugs for pages related to this one.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+
+  }
+}

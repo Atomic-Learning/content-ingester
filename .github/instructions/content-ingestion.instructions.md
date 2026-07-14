@@ -8,6 +8,7 @@ applyTo: "**"
 ## Scope
 
 - Default to top-level `inputs/`, `outputs/`, and `templates/`. Within `inputs/`, website export files go in `live-website-export/` and new content to ingest goes in `content-to-ingest/`.
+- If a `human-inputs/` directory exists alongside the active input directory, read and use its contents (e.g. images, supplementary notes) when generating pages. It is optional — if it is absent, continue normally without complaint.
 - Allow overriding ingestion inputs/outputs via `.env`:
   - `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)
   - `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
@@ -24,6 +25,7 @@ applyTo: "**"
 - Reuse existing support docs as references when needed:
   - `.github/instructions/atomisation-guidelines.md`
   - `.github/instructions/updating-proposed-structure.md`
+  - `.github/instructions/updating-metadata.md`
   - `.github/instructions/content_file_details.md`
   - `.github/instructions/pdf-data-extraction.md`
   - `.github/instructions/pptx-data-extraction.md`
