@@ -48,6 +48,16 @@ pip install -r requirements.txt
 A GitHub Personal Access Token (PAT) with repo permissions is required to publish content.
 Add your token to a `.env` file `GITHUB_PAT=your_github_pat_here`.
 
+### Author configuration
+
+To automatically set author names in generated metadata files, add `CONTENT_INGESTER_AUTHORS` to your `.env`:
+
+```
+CONTENT_INGESTER_AUTHORS=author-name,another-author
+```
+
+Author identifiers must be lowercase and hyphen-separated (e.g., `jane-smith`, `john-doe`). These identifiers should be the same as those used in the live site.
+
 ## Workflow
 
 The agent instructions provided in this repository contain the full process of content ingestion and should be able to produce sensible output from input content without human intervention. Nevertheless, it is recommended to guide the agent using the checkpoints below to ensure high-quality output.
@@ -101,6 +111,10 @@ Prompt the agent to generate the next page folder and content, for example:
 `Using approved <output-dir>/proposed_structure.json, generate the next page at <output-dir>/<slug>/ with all required files.`
 
 Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in the configured output directory. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
+
+If `CONTENT_INGESTER_AUTHORS` is configured in `.env`, author names will be automatically applied to all generated metadata files during this stage.
+
+Review each page for quality:
 
 1. Each page folder contains all required files.
 2. metadata.json slug matches folder name.
