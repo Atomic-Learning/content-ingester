@@ -47,6 +47,7 @@ Thumbs.db
 
 # Working Data
 inputs/*
+!inputs/authors.md
 outputs/*
 templates/*
 workflow-validation/*/generated-outputs/*
