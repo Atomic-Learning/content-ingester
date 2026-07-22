@@ -23,12 +23,11 @@ Resolve paths from `.env` before running:
 
 ## Configuration
 
-Create `<input-dir>/authors.md` (default: `inputs/authors.md`) with one author identifier per line:
+The user should have edited `<input-dir>/authors.md` (default: `inputs/authors.md`) to specify the author identifiers to use in the metadata files, one author per line. For example:
 
 ```
 jane-doe
 joe-bloggs
-chris-cooling
 ```
 
 Author identifiers must be lowercase, hyphen-separated (e.g. `john-doe`), matching the pattern `^[a-z0-9]+(-[a-z0-9]+)*$`.
