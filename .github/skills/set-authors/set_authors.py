@@ -218,6 +218,10 @@ def main() -> int:
                 file=sys.stderr,
             )
             print(
+                "  Names should be lower case, with words separated by hyphens:",
+                file=sys.stderr,
+            )
+            print(
                 "    jane-doe",
                 file=sys.stderr,
             )
