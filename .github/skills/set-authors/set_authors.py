@@ -47,24 +47,29 @@ def _validate_author_id(author_id: str) -> bool:
     return bool(re.match(r"^[a-z0-9]+(-[a-z0-9]+)*$", author_id))
 
 
-def _warn_if_example_authors(authors: list[str]) -> None:
-    """Warn if authors list contains example/placeholder names.
+def _check_example_authors(authors: list[str]) -> bool:
+    """Check if authors list contains example/placeholder names.
     
     Example authors are: jane-doe, joe-bloggs
+    
+    Returns:
+        True if example authors found, False otherwise.
     """
     example_authors = {"jane-doe", "joe-bloggs"}
     found_examples = [a for a in authors if a in example_authors]
     
     if found_examples:
         print(
-            f"\n⚠ Warning: Found example author(s): {', '.join(found_examples)}",
+            f"✗ Error: Found example author(s): {', '.join(found_examples)}",
             file=sys.stderr,
         )
         print(
             "  Please replace these with real author identifiers in inputs/authors.md",
             file=sys.stderr,
         )
-        print()
+        return True
+    
+    return False
 
 
 def _parse_authors_from_file(authors_path: Path) -> list[str] | None:
@@ -233,8 +238,9 @@ def main() -> int:
         
         print(f"  Authors: {', '.join(authors)}")
         
-        # Warn if using example authors
-        _warn_if_example_authors(authors)
+        # Fail if using example authors
+        if _check_example_authors(authors):
+            return 2
         
         # Collect metadata files to process
         if args.metadata_file:

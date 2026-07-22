@@ -50,7 +50,7 @@ python .github/skills/set-authors/set_authors.py --metadata-file <output-dir>/<s
 
 - `<input-dir>/authors.md` must exist and contain at least one valid author identifier. The script exits with code 2 if missing or empty.
 - Authors in the file must be one per line, lowercase and hyphen-separated. Invalid identifiers cause exit code 2.
-- **Example authors warning**: If `authors.md` contains example author names (`jane-doe` or `joe-bloggs`), the script will print a warning to remind you to replace them with real authors. The script will still proceed and apply the example authors to metadata files.
+- **Example authors check**: If `authors.md` contains example author names (`jane-doe` or `joe-bloggs`), the script will exit with code 2 to prevent accidental use of placeholder names in production. Replace them with real author identifiers.
 - Updated metadata.json files are validated against the metadata schema. Validation failures cause exit code 1.
 - Output directory must exist and contain metadata.json files. Missing directory or no files found causes exit code 2.
 - This skill is intended to be run after page generation when you want to standardise author names across a batch.
