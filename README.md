@@ -50,13 +50,14 @@ Add your token to a `.env` file `GITHUB_PAT=your_github_pat_here`.
 
 ### Author configuration
 
-To automatically set author names in generated metadata files, add `CONTENT_INGESTER_AUTHORS` to your `.env`:
+To automatically set author names in generated metadata files, create `inputs/authors.md` with one author identifier per line, for example:
 
 ```
-CONTENT_INGESTER_AUTHORS=author-name,another-author
+jane-doe
+joe-bloggs
 ```
 
-Author identifiers must be lowercase and hyphen-separated (e.g., `jane-smith`, `john-doe`). These identifiers should be the same as those used in the live site.
+Author identifiers must be lowercase and hyphen-separated (e.g., `jane-smith`, `john-doe`). This is optional — if not configured, the `set-authors` skill will skip with an informative error message. See `.github/skills/set-authors/SKILL.md` for details.
 
 ## Workflow
 
@@ -112,7 +113,7 @@ Prompt the agent to generate the next page folder and content, for example:
 
 Repeat this for each page. The agent will determine the next page based on which pages in proposed_structure.json do not yet have a folder in the configured output directory. You can delete a page folder and revisit it, or ask the agent to skip a page and return to it later.
 
-If `CONTENT_INGESTER_AUTHORS` is configured in `.env`, author names will be automatically applied to all generated metadata files during this stage.
+If `inputs/authors.md` is present, author names will be automatically applied to all generated metadata files during this stage.
 
 Review each page for quality:
 

@@ -1,16 +1,16 @@
-"""Set author names in metadata.json files from .env configuration.
+"""Set author names in metadata.json files from authors.md.
 
-This script reads author names from CONTENT_INGESTER_AUTHORS in .env and applies
-them to metadata.json files. It validates the updated files against the metadata schema.
+This script reads author names from <input-dir>/authors.md and applies them to
+metadata.json files. It validates the updated files against the metadata schema.
 
 Usage:
     Update all metadata.json files under an output directory::
 
-        python .github/skills/set-authors-from-env/set_authors.py --output-dir outputs
+        python .github/skills/set-authors/set_authors.py --output-dir outputs
 
     Update a single metadata.json file::
 
-        python .github/skills/set-authors-from-env/set_authors.py --metadata-file outputs/my-page/metadata.json
+        python .github/skills/set-authors/set_authors.py --metadata-file outputs/my-page/metadata.json
 """
 
 import argparse
@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
+import os
 
 
 def _find_repo_root() -> Path:
@@ -32,6 +33,11 @@ def _find_repo_root() -> Path:
 ROOT_DIR = _find_repo_root()
 load_dotenv(ROOT_DIR / ".env")
 
+# Resolve input directory from .env (default: inputs/)
+INPUT_DIR = Path(os.getenv("CONTENT_INGESTER_INPUTS_DIR", "inputs"))
+if not INPUT_DIR.is_absolute():
+    INPUT_DIR = ROOT_DIR / INPUT_DIR
+
 # Schema for validation
 DEFAULT_SCHEMA_FILE = ROOT_DIR / ".github" / "instructions" / "metadata.schema.json"
 
@@ -41,40 +47,61 @@ def _validate_author_id(author_id: str) -> bool:
     return bool(re.match(r"^[a-z0-9]+(-[a-z0-9]+)*$", author_id))
 
 
-def _parse_authors_from_env() -> list[str] | None:
-    """Read and parse CONTENT_INGESTER_AUTHORS from .env.
+def _warn_if_example_authors(authors: list[str]) -> None:
+    """Warn if authors list contains example/placeholder names.
     
-    Expected format: comma-separated list of author slugs, e.g.
-    CONTENT_INGESTER_AUTHORS=john-doe,jane-smith,chris-cooling
+    Example authors are: jane-doe, joe-bloggs
+    """
+    example_authors = {"jane-doe", "joe-bloggs"}
+    found_examples = [a for a in authors if a in example_authors]
+    
+    if found_examples:
+        print(
+            f"\n⚠ Warning: Found example author(s): {', '.join(found_examples)}",
+            file=sys.stderr,
+        )
+        print(
+            "  Please replace these with real author identifiers in inputs/authors.md",
+            file=sys.stderr,
+        )
+        print()
+
+
+def _parse_authors_from_file(authors_path: Path) -> list[str] | None:
+    """Read and parse authors from authors.md file.
+    
+    Expected format: one author slug per line, e.g.
+    jane-doe
+    jim-bloggs
+    chris-cooling
     
     Returns:
-        List of author slugs (stripped and validated), or None if not configured.
+        List of author slugs (stripped and validated), or None if file not found.
         
     Raises:
-        ValueError: If authors are configured but contain invalid slugs.
+        ValueError: If file contains invalid author slugs or is malformed.
     """
-    import os
-    
-    authors_str = os.getenv("CONTENT_INGESTER_AUTHORS", "").strip()
-    
-    if not authors_str:
+    if not authors_path.exists():
         return None
     
-    # Parse comma-separated authors
-    authors = [a.strip() for a in authors_str.split(",") if a.strip()]
+    try:
+        with authors_path.open("r", encoding="utf-8") as f:
+            lines = [line.strip() for line in f if line.strip()]
+    except OSError as e:
+        raise ValueError(f"Failed to read {authors_path}: {e}")
     
-    if not authors:
+    if not lines:
         return None
     
     # Validate each author ID
-    invalid_authors = [a for a in authors if not _validate_author_id(a)]
+    invalid_authors = [a for a in lines if not _validate_author_id(a)]
     if invalid_authors:
         raise ValueError(
-            f"Invalid author identifier(s): {', '.join(invalid_authors)}. "
+            f"Invalid author identifier(s) in {authors_path}: {', '.join(invalid_authors)}. "
             "Author identifiers must be lowercase, hyphen-separated (e.g. john-doe)."
         )
     
-    return authors
+    return lines
 
 
 def _validate_metadata_file(metadata_path: Path) -> bool:
@@ -152,7 +179,7 @@ def _process_metadata_file(metadata_path: Path, authors: list[str]) -> bool:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Set author names in metadata.json files from .env configuration.",
+        description="Set author names in metadata.json files from authors.md.",
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
@@ -172,14 +199,15 @@ def main() -> int:
     try:
         args = parse_args()
         
-        # Parse authors from .env
-        print("Reading authors from .env...")
-        authors = _parse_authors_from_env()
+        # Parse authors from authors.md
+        authors_file = INPUT_DIR / "authors.md"
+        print(f"Reading authors from {authors_file}...")
+        authors = _parse_authors_from_file(authors_file)
         
         # Authors are required for this skill
         if not authors:
             print(
-                "✗ Error: CONTENT_INGESTER_AUTHORS not configured in .env.",
+                f"✗ Error: {authors_file} not found or is empty.",
                 file=sys.stderr,
             )
             print(
@@ -187,12 +215,23 @@ def main() -> int:
                 file=sys.stderr,
             )
             print(
-                "  Please add: CONTENT_INGESTER_AUTHORS=author-one,author-two",
+                "  Please create authors.md with one author per line:",
+                file=sys.stderr,
+            )
+            print(
+                "    jane-doe",
+                file=sys.stderr,
+            )
+            print(
+                "    jim-bloggs",
                 file=sys.stderr,
             )
             return 2
         
         print(f"  Authors: {', '.join(authors)}")
+        
+        # Warn if using example authors
+        _warn_if_example_authors(authors)
         
         # Collect metadata files to process
         if args.metadata_file:
