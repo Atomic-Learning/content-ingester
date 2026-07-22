@@ -57,7 +57,7 @@ python tools/extract_pdf_assets.py
 Run with explicit background and output path:
 
 ```bash
-python tools/extract_pdf_assets.py --background transparent --output-dir outputs/pdf-processing
+python tools/extract_pdf_assets.py --output-dir outputs/pdf-processing
 ```
 
 Enable vector fallback when diagrams may be vector-drawn:
@@ -83,13 +83,15 @@ If folder-name collisions occur and `--overwrite` is not set, the script writes 
 
 ## Background Rules
 
-Ask/confirm desired image background when required:
+Always use `white` background unless the user explicitly requests a different mode.
 
-- `transparent`: default for diagrams/logos
-- `white`: flattened non-alpha export
-- `opaque`: non-alpha export
+Available modes (pass via `--background`):
 
-When the workflow is blocked or ambiguous, ask concise user questions (background mode, vector fallback, overwrite behaviour, OCR decision) before proceeding.
+- `white` (**default**): flattened white-background export
+- `transparent`: preserves alpha channel; use only when the user asks for it
+- `opaque`: non-alpha export without white fill; use only when the user asks for it
+
+When the workflow is blocked or ambiguous, ask concise user questions (vector fallback, overwrite behaviour, OCR decision) before proceeding. Do not ask about background unless there is a specific reason to deviate from the white default.
 
 ## Consistency Checks After Extraction
 
