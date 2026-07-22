@@ -73,7 +73,6 @@ def _parse_authors_from_file(authors_path: Path) -> list[str] | None:
     Expected format: one author slug per line, e.g.
     jane-doe
     jim-bloggs
-    chris-cooling
     
     Returns:
         List of author slugs (stripped and validated), or None if file not found.
