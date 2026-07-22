@@ -13,7 +13,8 @@
         "ms-python.vscode-pylance",
         "ms-toolsai.jupyter",
         "GNDEV.md-mermaid-preview-support",
-        "george-alisson.html-preview-vscode"
+        "george-alisson.html-preview-vscode",
+        "shd101wyy.markdown-preview-enhanced"
       ]
     }
   }
