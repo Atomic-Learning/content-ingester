@@ -59,6 +59,12 @@ Run with explicit output path:
 python tools/extract_pptx_assets.py --output-dir outputs/pptx-processing
 ```
 
+Override background when the user requests a specific mode:
+
+```bash
+python tools/extract_pptx_assets.py --background transparent
+```
+
 Allow in-place overwrite of existing extraction folders when intentionally re-running:
 
 ```bash
@@ -77,6 +83,16 @@ Text is organised by slide, with a `## Slide N: <title>` header per slide and `-
 Image filenames follow the pattern `s<slide>_img<index>.png` (for example `s002_img001.png`).
 
 If folder-name collisions occur and `--overwrite` is not set, the script writes to suffixed folders (for example `slides-2`).
+
+## Background Rules
+
+Always use `white` background unless the user explicitly requests a different mode.
+
+Available modes (pass via `--background`):
+
+- `white` (**default**): flattened white-background export
+- `transparent`: preserves alpha channel; use only when the user asks for it
+- `opaque`: non-alpha export without white fill; use only when the user asks for it
 
 ## Blocker Questions
 
