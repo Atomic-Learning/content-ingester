@@ -16,6 +16,7 @@ applyTo: "**"
 ## Non-negotiable Rules
 
 - Keep work in dependency order.
+- **Always activate the `.venv` virtual environment before running any Python command.** Use `. .venv/bin/activate` on Linux/macOS or `.venv\Scripts\activate` on Windows in the terminal before executing Python scripts or tools.
 - Before proposing structure or generating pages, download the content template repository (`https://github.com/Atomic-Learning/content-template`) into `templates/` by following `.github/skills/download-template/SKILL.md`. Do not continue until the template files are present in `templates/`.
 - Pause for user approval at each checkpoint and after each generated page.
 - Keep generated ingestion artifacts in the active output directory for the run.
