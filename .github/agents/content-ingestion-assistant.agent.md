@@ -21,6 +21,7 @@ Primary workflow:
    - `.github/skills/proposed-structure-review-and-edit/SKILL.md`
    - `.github/skills/page-generation-and-review-and-edit/SKILL.md`
    - `.github/skills/license-file-copying/SKILL.md`
+   - `.github/skills/set-authors/SKILL.md`
    - `.github/skills/check-output-consistency/SKILL.md`
    - `.github/skills/upload-and-check/SKILL.md`
 
