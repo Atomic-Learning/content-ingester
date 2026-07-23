@@ -1,0 +1,57 @@
+---
+name: set-authors
+description: Set author names in metadata.json files from authors.md.
+---
+
+# set-authors
+
+Use this skill to populate `authors` fields in metadata.json files from a central `authors.md` file.
+
+Resolve paths from `.env` before running:
+- `CONTENT_INGESTER_INPUTS_DIR` (default: `inputs`)
+- `CONTENT_INGESTER_OUTPUTS_DIR` (default: `outputs`)
+
+## Inputs
+
+- `<input-dir>/authors.md` file listing author identifiers (one per line)
+- `<output-dir>/<slug>/metadata.json` file(s) to update
+
+## Produce
+
+- Updated `metadata.json` files with `authors` field set from `authors.md`
+- Validation report showing which files were modified and which failed validation
+
+## Configuration
+
+The user should have edited `<input-dir>/authors.md` (default: `inputs/authors.md`) to specify the author identifiers to use in the metadata files, one author per line. For example:
+
+```
+jane-doe
+joe-bloggs
+```
+
+Author identifiers must be lowercase, hyphen-separated (e.g. `john-doe`), matching the pattern `^[a-z0-9]+(-[a-z0-9]+)*$`.
+
+## Usage
+
+Update all metadata.json files under an output directory:
+
+```bash
+python .github/skills/set-authors/set_authors.py --output-dir <output-dir>
+```
+
+Update a single metadata.json file:
+
+```bash
+python .github/skills/set-authors/set_authors.py --metadata-file <output-dir>/<slug>/metadata.json
+```
+
+## Guardrails
+
+- `<input-dir>/authors.md` must exist and contain at least one valid author identifier. The script exits with code 2 if missing or empty.
+- Authors in the file must be one per line, lowercase and hyphen-separated. Invalid identifiers cause exit code 2.
+- **Example authors check**: If `authors.md` contains example author names (`jane-doe` or `joe-bloggs`), the script will exit with code 2 to prevent accidental use of placeholder names in production. Replace them with real author identifiers.
+- Updated metadata.json files are validated against the metadata schema. Validation failures cause exit code 1.
+- Output directory must exist and contain metadata.json files. Missing directory or no files found causes exit code 2.
+- This skill is intended to be run after page generation when you want to standardise author names across a batch.
+- All generated pages require at least one author (per the metadata schema), so this skill enforces author configuration.

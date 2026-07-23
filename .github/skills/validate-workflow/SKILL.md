@@ -24,7 +24,15 @@ The `Content Ingestion Assistant` must treat:
 
 The handoff prompt must explicitly state validation mode and provide these exact folders.
 
-3. Compare generated outputs to expected outputs and overwrite the report section for the run:
+3. Run `set-authors` to populate author metadata from case-local `authors.md`:
+
+```bash
+CONTENT_INGESTER_INPUTS_DIR=workflow-validation/<case-name>/inputs python .github/skills/set-authors/set_authors.py --output-dir workflow-validation/<case-name>/generated-outputs
+```
+
+This ensures author fields are set correctly using the case-local authors file before comparison.
+
+4. Compare generated outputs to expected outputs and overwrite the report section for the run:
 
 ```bash
 python .github/skills/validate-workflow/validation_compare_case.py --case <case-name> --report workflow-validation/validation-report.md
@@ -32,7 +40,7 @@ python .github/skills/validate-workflow/validation_compare_case.py --case <case-
 
 Capture the script's stdout — it contains unified diffs for every changed text file.
 
-4. Read the diffs from stdout, then write concise qualitative sections into the report.
+5. Read the diffs from stdout, then write concise qualitative sections into the report.
 
 The script leaves two empty sections in the report for you to fill in. Do not copy or paste raw diff content into the report — write a brief human-readable summary only.
 
