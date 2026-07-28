@@ -30,6 +30,7 @@ class CheckResult:
 
 
 def find_repo_root() -> Path:
+    """Locate the repository root directory."""
     for candidate in Path(__file__).resolve().parents:
         if (candidate / "README.md").exists() and (candidate / ".github").exists():
             return candidate
@@ -37,6 +38,16 @@ def find_repo_root() -> Path:
 
 
 def resolve_dir(root: Path, env_name: str, fallback: str) -> Path:
+    """Resolve a directory path from an environment variable or fallback.
+
+    Args:
+        root: Repository root used to resolve relative paths.
+        env_name: Environment variable name to read.
+        fallback: Default directory value when env var is unset.
+
+    Returns:
+        Path: Absolute or root-relative resolved directory path.
+    """
     raw = os.getenv(env_name, fallback).strip()
     path = Path(raw)
     if not path.is_absolute():
@@ -45,6 +56,14 @@ def resolve_dir(root: Path, env_name: str, fallback: str) -> Path:
 
 
 def detect_existing_content_file(inputs_dir: Path) -> Optional[Path]:
+    """Detect the most relevant existing content export file.
+
+    Args:
+        inputs_dir: Base inputs directory for ingestion assets.
+
+    Returns:
+        Optional[Path]: Detected content export file path, or None if missing.
+    """
     patterns = [
         "current_content.md",
         "*current_content*.md",
@@ -71,6 +90,14 @@ def detect_existing_content_file(inputs_dir: Path) -> Optional[Path]:
 
 
 def detect_tags_file(inputs_dir: Path) -> Optional[Path]:
+    """Detect the most relevant tags export file.
+
+    Args:
+        inputs_dir: Base inputs directory for ingestion assets.
+
+    Returns:
+        Optional[Path]: Detected tags file path, or None if missing.
+    """
     patterns = [
         "tags_current.md",
         "*tags_current*.md",
@@ -96,6 +123,14 @@ def detect_tags_file(inputs_dir: Path) -> Optional[Path]:
 
 
 def parse_existing_slugs(content_file: Optional[Path]) -> Set[str]:
+    """Parse known slugs from an existing content export file.
+
+    Args:
+        content_file: Content export file to parse, if available.
+
+    Returns:
+        Set[str]: Slugs discovered from bullet entries and markdown headings.
+    """
     slugs: Set[str] = set()
     if content_file is None or not content_file.exists():
         return slugs
@@ -117,6 +152,14 @@ def parse_existing_slugs(content_file: Optional[Path]) -> Set[str]:
 
 
 def parse_existing_tags(tags_file: Optional[Path]) -> Set[str]:
+    """Parse known tags from an existing tags export file.
+
+    Args:
+        tags_file: Tags export file to parse, if available.
+
+    Returns:
+        Set[str]: Distinct non-empty tags found in the export.
+    """
     tags: Set[str] = set()
     if tags_file is None or not tags_file.exists():
         return tags
@@ -135,10 +178,26 @@ def parse_existing_tags(tags_file: Optional[Path]) -> Set[str]:
 
 
 def load_json(path: Path) -> dict:
+    """Load and deserialize JSON from disk.
+
+    Args:
+        path: File path for the JSON document.
+
+    Returns:
+        dict: Parsed JSON object.
+    """
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def discover_pages(outputs_dir: Path) -> List[Path]:
+    """Discover generated page directories under outputs.
+
+    Args:
+        outputs_dir: Output root directory containing generated pages.
+
+    Returns:
+        List[Path]: Sorted page directories that contain metadata.json.
+    """
     return sorted(
         [p for p in outputs_dir.iterdir() if p.is_dir() and (
             p / "metadata.json").exists()],
@@ -147,6 +206,15 @@ def discover_pages(outputs_dir: Path) -> List[Path]:
 
 
 def validate_metadata_schema(metadata_files: Sequence[Path], schema_file: Path) -> List[str]:
+    """Validate metadata files against the configured JSON schema.
+
+    Args:
+        metadata_files: Metadata file paths to validate.
+        schema_file: JSON schema file used for validation.
+
+    Returns:
+        List[str]: Validation error messages, empty when all files pass.
+    """
     errors: List[str] = []
     schema = load_json(schema_file)
     validator = Draft7Validator(schema)
@@ -174,6 +242,17 @@ def run_consistency_checks(
     inputs_dir: Path,
     strict_tags: bool,
 ) -> CheckResult:
+    """Run consistency validations for generated outputs.
+
+    Args:
+        repo_root: Repository root directory.
+        outputs_dir: Active output directory with generated pages.
+        inputs_dir: Active input directory with export references.
+        strict_tags: Whether missing tags should be treated as errors.
+
+    Returns:
+        CheckResult: Aggregated errors and warnings from all checks.
+    """
     errors: List[str] = []
     warnings: List[str] = []
 
@@ -290,6 +369,16 @@ def run_consistency_checks(
 
 
 def regenerate_dependency_graph(repo_root: Path, outputs_dir: Path, inputs_dir: Path) -> None:
+    """Regenerate dependency_graph.md from metadata using the graph script.
+
+    Args:
+        repo_root: Repository root directory.
+        outputs_dir: Output directory containing metadata files.
+        inputs_dir: Input directory used for resolving external references.
+
+    Returns:
+        None: This function runs a subprocess for side effects only.
+    """
     script = repo_root / ".github" / "skills" / \
         "input-to-proposed-structure" / "generate_prerequisite_graph.py"
     cmd = [
@@ -308,6 +397,14 @@ def regenerate_dependency_graph(repo_root: Path, outputs_dir: Path, inputs_dir: 
 
 
 def build_related_recommendations(outputs_dir: Path) -> str:
+    """Generate related-content recommendations from metadata relationships.
+
+    Args:
+        outputs_dir: Output directory containing page metadata.
+
+    Returns:
+        str: Markdown content for related_content_recommendations.md.
+    """
     pages = discover_pages(outputs_dir)
     metadata_by_slug: Dict[str, dict] = {}
     for page_dir in pages:
@@ -370,6 +467,7 @@ def build_related_recommendations(outputs_dir: Path) -> str:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for consistency-check execution."""
     parser = argparse.ArgumentParser(
         description="Run repeatable consistency checks for generated output pages.",
     )
@@ -404,6 +502,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """Run consistency checks and optional artifact generation."""
     args = parse_args()
     repo_root = find_repo_root()
     load_dotenv(repo_root / ".env")
