@@ -1,38 +1,71 @@
 # Content Ingester
 
-This repository supports the Atomic Learning content-ingestion workflow:
+Content Ingester turns teaching material into Atomic Learning pages. It helps an editor propose page structure, generate content in dependency order, check the result, and publish each page to its own GitHub repository.
 
-1. Start from source teaching material in inputs.
-2. Propose atomic pages and their prerequisite structure.
-3. Build page folders with metadata and HTML content.
-4. Validate structure and consistency.
-5. Publish pages as one GitHub repository per page.
+The workflow is agent-assisted, with required human approval at each checkpoint.
 
-The process is designed so a human editor can run it end-to-end with clear checkpoints.
+## Contents
 
-## Set up environment
+- [How it works](#how-it-works)
+- [Quick start](#quick-start)
+- [Set up the environment](#set-up-the-environment)
+- [Prepare the inputs](#prepare-the-inputs)
+- [Run the workflow](#run-the-workflow)
+- [Validate workflow changes](#validation-workflow-prompt)
+- [Final checklist](#final-checklist)
 
-It is recommended to open this repository in Visual Studio Code [locally](#local-setup) on your machine with GitHub Copilot agent or [remotely](#github-codespaces-setup) in GitHub Codespaces.
+## How it works
 
-### GitHub Codespaces setup
+| Stage    | Action                                                     | Main output                                                       | Who Does this? |
+| -------- | ---------------------------------------------------------- | ----------------------------------------------------------------- | -------------- |
+| Prepare  | Add source material and current website exports            | Files under `inputs/`                                             | Author         |
+| Propose  | Split the material into atomic pages and map prerequisites | `proposed_structure.json` and `dependency_graph.md`               | Author & Agent |
+| Generate | Create one page at a time in dependency order              | Page folders containing content, metadata, licence, and resources | Author & Agent |
+| Check    | Validate files, links, tags, and dependencies              | Updated graph and related-content recommendations                 | Author & Agent |
+| Publish  | Upload and verify one page at a time                       | GitHub repositories and `upload_summary.txt`                      | Author & Agent |
 
-This repository includes a dev container configuration in `.devcontainer/` for Codespaces.
+## Quick start
+
+1. Complete either the [Codespaces setup](#github-codespaces) or [local setup](#local-setup).
+2. Configure [GitHub access](#github-api-access) and [authors](#author-configuration).
+3. Download current content and tags from the [Atomic Learning data hub](http://atomic.dept.ic.ac.uk/data).
+4. Add the exports and new teaching material using the [input layout](#input-layout).
+5. Ask the agent to begin [Checkpoint 1](#checkpoint-1-propose-the-structure).
+6. Review and approve each checkpoint before continuing.
+
+## Set up the environment
+
+Use this repository in Visual Studio Code with GitHub Copilot, either in GitHub Codespaces or on your local machine.
+
+### GitHub Codespaces
+
+The repository includes a development container configuration in `.devcontainer/` which will setup a python envrioment and preload extensions that will be used during ingestion.
 
 1. Open the repository on GitHub.
-2. Select **Code** -> **Codespaces** -> **Create codespace on main** (or your working branch).
-3. Wait for container build and `postCreateCommand` to finish.
+2. Select **Code** -> **Codespaces** -> **Create codespace on main**, or choose your working branch.
+3. Wait for the container build and `postCreateCommand` to finish.
+
+The container creates `.venv` and installs the Python dependencies automatically.
 
 ### Local setup
 
-Python 3.10 or higher is required. Create and activate a virtual environment, then install dependencies. The agent will attempt
+Python 3.12 or higher is required. Create and activate a virtual environment, then install dependencies. The agent will attempt
 to perform the local setup automatically if a venv is not detected.
 
-Windows (PowerShell):
+macOS or Linux:
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+Windows PowerShell:
 
 ```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
 Linux/macOS (bash):
@@ -57,39 +90,63 @@ jane-doe
 joe-bloggs
 ```
 
-Author identifiers must be lowercase and hyphen-separated (e.g., `jane-smith`, `john-doe`). This is optional — if not configured, the `set-authors` skill will skip with an informative error message. See `.github/skills/set-authors/SKILL.md` for details.
+Author identifiers must be lowercase and hyphen-separated (e.g., `jane-smith`, `john-doe`). This is required — if not configured, the `set-authors` skill will skip with an informative error message. See `.github/skills/set-authors/SKILL.md` for details.
 
-## Workflow
+## Prepare the inputs
 
-The agent instructions provided in this repository contain the full process of content ingestion and should be able to produce sensible output from input content without human intervention. Nevertheless, it is recommended to guide the agent using the checkpoints below to ensure high-quality output.
+### Working directories
 
-### Before you start
+The agent reads these optional values from `.env` at the start of a run:
 
-The ingestion agent resolves these directories at run start:
+| Variable                       | Default   | Purpose                                           |
+| ------------------------------ | --------- | ------------------------------------------------- |
+| `CONTENT_INGESTER_INPUTS_DIR`  | `inputs`  | Source material and live website exports          |
+| `CONTENT_INGESTER_OUTPUTS_DIR` | `outputs` | Proposed structures, generated pages, and reports |
 
-- Input directory: `CONTENT_INGESTER_INPUTS_DIR` (default `inputs/`)
-- Output directory: `CONTENT_INGESTER_OUTPUTS_DIR` (default `outputs/`)
+Paths may be relative to the repository root or absolute.
 
-Retrieve content and tag input files from the [live website](http://atomic.dept.ic.ac.uk/data) data hub. You can select the specific tags you need from the list of all the current ones in the platform. You may also filter the tags through the search bar to make it easier to navigate through them. Once the necessary tags are selected you can download both the files.
+### Input layout
 
-Place files in:
+1. Navigate to the [Atomic Learning data hub](http://atomic.dept.ic.ac.uk/data)
+   ![Screenshot of the data hub page on atomic learning website](assets/images/atomic-learning-download-content.png)
+2. Using the checkboxes select tags that are related to the content you want to ingest.
+3. Download the selected tags and content using the buttons at the bottom of the page.
+4. Once downloaded arrange the files as follows:
 
-- `CONTENT_INGESTER_INPUTS_DIR` (for example `inputs/`):
-  - `live-website-export/` subfolder:
-    - current_content.md (or similarly named existing content export)
-      - Should list existing page slugs with brief descriptions and prerequisite/related links where available.
-      - Used by the agent to avoid duplicating already-published content and to validate prerequisite references.
-    - tags_current.md (or similar tags export)
-      - Should list the current platform tag names (one per line or simple grouped lists).
-      - Used by the agent to reuse existing tags and only propose new tags when necessary.
-  - `content-to-ingest/` subfolder:
-    - new source material in .md, .ipynb, .pdf, or .pptx format
+```text
+inputs/
+|-- authors.md                         # Optional
+|-- content-to-ingest/
+|   `-- <new teaching material>
+|-- human-inputs/                      # Optional notes or images
+`-- live-website-export/
+    |-- <current content export>.md
+    `-- <current tags export>.md
+```
 
-PDF files are supported. For PDFs, the agent should use `tools/extract_pdf_assets.py` (documented in `.github/instructions/pdf-data-extraction.md`) before proposing structure or generating page content. By default, the extractor reads PDFs from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pdf-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
+5. It is suggested that you ingest one file of new teaching material at a time, particularly if this is your first time using the tool. This will reduce the complexity of the ingestion process for both you and the AI agent, leading to a more manageable workflow and better results.
+   The current content export generated by the Atomic Learning website will include existing page slugs and descriptions. This prevents proposed pages from duplicating existing content, and allows proposed pages to used existing content as prerequisites.
 
-PPTX files are supported. For PPTX files, the agent should use `tools/extract_pptx_assets.py` (documented in `.github/instructions/pptx-data-extraction.md`) before proposing structure or generating page content. The agent should do this without prompting from you. By default, the extractor reads PPTX files from `<input-dir>/content-to-ingest/` and writes artifacts to `<output-dir>/pptx-processing/`, creating suffixed output folders unless overwrite is explicitly requested.
+The tags export should list current platform tags. The agent reuses these tags and proposes new ones only when necessary.
 
-Outputs will be created in the configured output directory (default `outputs/`). Template assets may be downloaded to `templates/`.
+### Supported source files
+
+Place new source material in `<input-dir>/content-to-ingest/`. As part of the workflow, the agent may use tools to process some file types to prepare for ingestion.
+
+| Format                      | Preparation                                                          |
+| --------------------------- | -------------------------------------------------------------------- |
+| Markdown (`.md`)            | No extraction required                                               |
+| Jupyter Notebook (`.ipynb`) | No extraction required                                               |
+| PDF (`.pdf`)                | The agent runs `tools/extract_pdf_assets.py` before proposing pages  |
+| PowerPoint (`.pptx`)        | The agent runs `tools/extract_pptx_assets.py` before proposing pages |
+
+PDF artifacts are written to `<output-dir>/pdf-processing/`. PowerPoint artifacts are written to `<output-dir>/pptx-processing/`. See the [PDF extraction instructions](.github/instructions/pdf-data-extraction.md) and [PowerPoint extraction instructions](.github/instructions/pptx-data-extraction.md) for details.
+
+Before proposing pages, the agent also ensures that the shared [content template](https://github.com/Atomic-Learning/content-template) is available under `templates/`.
+
+## Run the workflow
+
+Complete the checkpoints in order. Do not continue past a checkpoint until its outputs have been reviewed and approved.
 
 ### Checkpoint 1: Structure proposal
 
@@ -160,7 +217,7 @@ Prompt:
 
 `Run validate-workflow for all cases in workflow-validation/.`
 
-## Minimal Checklist
+## Final Checklist
 
 1. Approve proposed_structure.json and dependency_graph.md.
 2. Approve generated page files and metadata quality.
