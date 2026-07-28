@@ -23,8 +23,9 @@ python .github/skills/upload-and-check/github_uploader.py Atomic-Learning -d <ou
 python .github/skills/upload-and-check/github_uploader.py Atomic-Learning -d <output-dir>/<slug> --force
 ```
 
-3. Update `<output-dir>/upload_summary.txt` with cumulative status (created, skipped, failed).
-4. Pause for user live-site review before next page.
+3. If the user's GitHub account does not have permission to create new repositories in the organisation, the upload will fail. In that case, the user should contact the Atomic Learning team to request access, or send them the generated pages for them to upload on their behalf.
+4. Update `<output-dir>/upload_summary.txt` with cumulative status (created, skipped, failed).
+5. Pause for user live-site review before next page.
 
 ## Guardrails
 - Keep upload order aligned with prerequisites.
