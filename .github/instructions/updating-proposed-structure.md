@@ -9,7 +9,7 @@ Use this guide when creating or editing `outputs/proposed_structure.json`.
 
 ## Required workflow after any update
 
-1. Validate JSON structure against schema:
+1. Validate JSON structure and reject circular prerequisite dependencies:
 
 ```bash
 python .github/skills/input-to-proposed-structure/validate_proposed_structure.py --proposed-file <output-dir>/proposed_structure.json
