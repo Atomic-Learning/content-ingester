@@ -36,5 +36,5 @@ six==1.17.0
 smmap==5.0.3
 typing-extensions==4.16.0
 urllib3==2.7.0
-wrapt==2.2.2
+wrapt==2.3.0
 xlsxwriter==3.2.9
