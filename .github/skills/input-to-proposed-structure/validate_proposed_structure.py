@@ -16,6 +16,14 @@ DEFAULT_SCHEMA_FILE = (
 
 
 def find_prerequisite_cycle(payload: object) -> Optional[List[str]]:
+    """Return a detected prerequisite cycle as an ordered slug path, if any.
+
+    Args:
+        payload: Parsed JSON payload expected to contain a pages list.
+
+    Returns:
+        Ordered cycle path ending at the repeated slug, or None when acyclic.
+    """
     if not isinstance(payload, dict) or not isinstance(payload.get("pages"), list):
         return None
 
@@ -67,6 +75,11 @@ def find_prerequisite_cycle(payload: object) -> Optional[List[str]]:
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse CLI arguments for proposed structure validation.
+
+    Returns:
+        Parsed CLI arguments namespace.
+    """
     parser = argparse.ArgumentParser(
         description="Validate proposed_structure.json against proposed-structure.schema.json.",
     )
@@ -80,6 +93,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def validate_proposed_structure(proposed_file: Path) -> int:
+    """Validate schema and prerequisite graph.
+
+    Args:
+        proposed_file: Path to the proposed_structure JSON file.
+
+    Returns:
+        Process exit code: 0 on success, 1 on validation failure.
+    """
     result = validate_file(proposed_file, DEFAULT_SCHEMA_FILE)
     if result != 0:
         return result
@@ -94,6 +115,11 @@ def validate_proposed_structure(proposed_file: Path) -> int:
 
 
 def main() -> int:
+    """Run the CLI entrypoint.
+
+    Returns:
+        Process exit code.
+    """
     args = parse_args()
     return validate_proposed_structure(args.proposed_file)
 
