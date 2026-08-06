@@ -18,7 +18,7 @@ Reference `.github/instructions/updating-proposed-structure.md` for the required
 ## Tasks
 
 - Validate required fields for each page.
-- Refine prerequisite ordering and avoid cycles.
+- Refine prerequisite ordering.
 - Improve split decisions to keep one learning objective per page.
 - Reconcile tags against `<input-dir>/live-website-export/tags_current.md`.
 
