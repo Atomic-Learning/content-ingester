@@ -46,7 +46,6 @@ env/
 Thumbs.db
 
 # Working Data
-inputs/*
 outputs/*
 templates/*
 workflow-validation/*/generated-outputs/*
