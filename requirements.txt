@@ -35,6 +35,6 @@ rpds-py==2026.6.3
 six==1.17.0
 smmap==5.0.3
 typing-extensions==4.16.0
-urllib3==2.7.0
+urllib3==2.8.0
 wrapt==2.4.1
 xlsxwriter==3.2.9
