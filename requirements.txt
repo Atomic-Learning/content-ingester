@@ -23,7 +23,7 @@ pycparser==3.11
 pydot==4.0.1
 pygithub==2.10.0
 pyjwt==2.15.1
-pymupdf==1.28.2
+pymupdf==2.0
 pynacl==1.6.2
 pyparsing==3.3.3
 python-dateutil==2.9.0.post0
