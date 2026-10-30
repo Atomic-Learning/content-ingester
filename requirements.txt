@@ -37,4 +37,4 @@ smmap==5.0.3
 typing-extensions==4.16.0
 urllib3==2.8.0
 wrapt==2.5.1
-xlsxwriter==3.2.9
+xlsxwriter==3.3.0
