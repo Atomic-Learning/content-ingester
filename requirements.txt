@@ -19,7 +19,7 @@ networkx==3.7
 numpy==2.5.4
 packaging==26.3
 pillow==13.0.0
-pycparser==3.11
+pycparser==3.12
 pydot==4.0.1
 pygithub==2.10.0
 pyjwt==2.15.1
