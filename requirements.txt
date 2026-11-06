@@ -5,7 +5,7 @@ charset-normalizer==3.5.2
 contourpy==1.4.0
 cryptography==50.0.2
 cycler==0.12.1
-deprecated==3.0.0
+deprecated==3.0.1
 fonttools==4.67.0
 gitdb==4.0.12
 gitpython==3.2.1
